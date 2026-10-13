@@ -1,3 +1,4 @@
+
 const SUPABASE_URL = "https://vguidroxrwujuubflsqr.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_SivSFlZ6Kb3YNh3ohPHeug_nfvDBxT6";
 
@@ -12,35 +13,41 @@ const reservationDialog = document.getElementById("reservation-dialog");
 const reservationForm = document.getElementById("reservation-form");
 
 let excursions = [];
+let currentCategory = "todas";
+let currentMonth = "todos";
+let currentSearch = "";
+let currentOrder = "data";
 
 function escapeHTML(value) {
   return String(value ?? "").replace(/[&<>"']/g, function (char) {
-    const entities = {
+    return {
       "&": "&amp;",
       "<": "&lt;",
       ">": "&gt;",
       '"': "&quot;",
       "'": "&#039;"
-    };
-
-    return entities[char];
+    }[char];
   });
 }
 
-function formatDate(value) {
+function formatDate(value, includeTime = true) {
   if (!value) return "A confirmar";
 
   const date = new Date(value);
-
   if (Number.isNaN(date.getTime())) return "A confirmar";
 
-  return date.toLocaleString("pt-BR", {
+  const options = {
     day: "2-digit",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
+    month: "short",
+    year: "numeric"
+  };
+
+  if (includeTime) {
+    options.hour = "2-digit";
+    options.minute = "2-digit";
+  }
+
+  return date.toLocaleString("pt-BR", options);
 }
 
 function formatPrice(value) {
@@ -72,8 +79,170 @@ function showStatus(message, type) {
   excursionsStatus.textContent = message;
   excursionsStatus.className = "status-message";
 
-  if (type) {
-    excursionsStatus.classList.add(type);
+  if (type) excursionsStatus.classList.add(type);
+}
+
+function getCategory(excursion) {
+  const text = (
+    (excursion.destination || "") + " " +
+    (excursion.title || "") + " " +
+    (excursion.description || "")
+  ).toLowerCase();
+
+  if (/praia|litoral|mar|ubatuba|santos|guarujá|bertioga|ilha bela|caraguá/.test(text)) {
+    return "praias";
+  }
+
+  if (/compras|brás|25 de março|bom retiro|shopping|santa ifigênia|feira/.test(text)) {
+    return "compras";
+  }
+
+  if (/parque|hopi hari|wet.?n.?wild|thermas|beto carrero|disney|aquário/.test(text)) {
+    return "parques";
+  }
+
+  if (/religios|aparecida|santuário|santuario|romaria|igreja|fé/.test(text)) {
+    return "religiosas";
+  }
+
+  return "passeios";
+}
+
+function getMonth(value) {
+  if (!value) return "";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+
+  return String(date.getMonth() + 1).padStart(2, "0") +
+    "-" + date.getFullYear();
+}
+
+function buildFilters() {
+  const host = document.getElementById("excursion-filters");
+  if (!host) return;
+
+  const months = [...new Set(
+    excursions.map(item => getMonth(item.departure_at)).filter(Boolean)
+  )].sort();
+
+  const monthOptions = months.map(value => {
+    const [month, year] = value.split("-");
+    const label = new Date(Number(year), Number(month) - 1, 1)
+      .toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+
+    return `<option value="${value}">${escapeHTML(
+      label.charAt(0).toUpperCase() + label.slice(1)
+    )}</option>`;
+  }).join("");
+
+  host.innerHTML = `
+    <div class="trip-filter-search">
+      <span aria-hidden="true">⌕</span>
+      <input
+        type="search"
+        id="excursion-search"
+        placeholder="Buscar por destino..."
+        aria-label="Buscar excursões por destino"
+      >
+    </div>
+
+    <div class="trip-filter-categories" aria-label="Categorias de excursões">
+      <button type="button" class="trip-filter-chip active" data-category="todas">Todas</button>
+      <button type="button" class="trip-filter-chip" data-category="praias">🏖 Praias</button>
+      <button type="button" class="trip-filter-chip" data-category="compras">🛍 Compras</button>
+      <button type="button" class="trip-filter-chip" data-category="parques">🎡 Parques</button>
+      <button type="button" class="trip-filter-chip" data-category="religiosas">🙏 Religiosas</button>
+      <button type="button" class="trip-filter-chip" data-category="passeios">🚌 Outros passeios</button>
+    </div>
+
+    <div class="trip-filter-selects">
+      <label>
+        <span>Data da viagem</span>
+        <select id="excursion-month">
+          <option value="todos">Todos os meses</option>
+          ${monthOptions}
+        </select>
+      </label>
+
+      <label>
+        <span>Ordenar por</span>
+        <select id="excursion-order">
+          <option value="data">Data mais próxima</option>
+          <option value="preco">Menor preço</option>
+          <option value="preco-desc">Maior preço</option>
+        </select>
+      </label>
+    </div>
+  `;
+
+  host.querySelector("#excursion-search").addEventListener("input", event => {
+    currentSearch = event.target.value.trim().toLocaleLowerCase("pt-BR");
+    applyFilters();
+  });
+
+  host.querySelector("#excursion-month").addEventListener("change", event => {
+    currentMonth = event.target.value;
+    applyFilters();
+  });
+
+  host.querySelector("#excursion-order").addEventListener("change", event => {
+    currentOrder = event.target.value;
+    applyFilters();
+  });
+
+  host.querySelectorAll("[data-category]").forEach(button => {
+    button.addEventListener("click", () => {
+      currentCategory = button.dataset.category;
+
+      host.querySelectorAll("[data-category]").forEach(item => {
+        item.classList.toggle("active", item === button);
+      });
+
+      applyFilters();
+    });
+  });
+}
+
+function applyFilters() {
+  let filtered = excursions.filter(excursion => {
+    const searchText = [
+      excursion.title,
+      excursion.destination,
+      excursion.description,
+      excursion.departure_location
+    ].join(" ").toLocaleLowerCase("pt-BR");
+
+    const matchesSearch = !currentSearch || searchText.includes(currentSearch);
+    const matchesCategory =
+      currentCategory === "todas" || getCategory(excursion) === currentCategory;
+    const matchesMonth =
+      currentMonth === "todos" || getMonth(excursion.departure_at) === currentMonth;
+
+    return matchesSearch && matchesCategory && matchesMonth;
+  });
+
+  if (currentOrder === "preco") {
+    filtered.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
+  } else if (currentOrder === "preco-desc") {
+    filtered.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
+  } else {
+    filtered.sort((a, b) =>
+      new Date(a.departure_at).getTime() - new Date(b.departure_at).getTime()
+    );
+  }
+
+  renderExcursions(filtered);
+
+  const count = filtered.length;
+
+  if (!count) {
+    showStatus("Nenhuma excursão encontrada com esses filtros. Tente outra busca.");
+  } else {
+    showStatus(
+      count === 1 ? "Encontramos 1 excursão para você." :
+      `Encontramos ${count} excursões para você.`
+    );
   }
 }
 
@@ -82,68 +251,98 @@ function renderExcursions(items) {
 
   excursionsList.innerHTML = "";
 
+  if (!items.length) {
+    excursionsList.innerHTML = `
+      <div class="trip-empty-state">
+        <span>🚌</span>
+        <h3>Nenhuma viagem encontrada</h3>
+        <p>Experimente alterar os filtros para descobrir outros destinos.</p>
+      </div>
+    `;
+    return;
+  }
+
   items.forEach(function (excursion) {
     const card = document.createElement("article");
-    card.className = "excursion-card";
+    card.className = "excursion-card trip-card";
 
     const imageURL = safeImageURL(excursion.image_url);
+    const description = excursion.description ||
+      "Entre em contato com nossa equipe para saber mais sobre esta viagem.";
 
-    let imageHTML;
+    const category = getCategory(excursion);
+    const categoryNames = {
+      praias: "Praias",
+      compras: "Compras",
+      parques: "Parques",
+      religiosas: "Turismo religioso",
+      passeios: "Excursão"
+    };
 
-    if (imageURL) {
-      imageHTML = `
-        <div class="excursion-image">
-          <img
-            src="${escapeHTML(imageURL)}"
-            alt="${escapeHTML(excursion.destination)}"
-            loading="lazy"
-            style="width:100%;height:100%;object-fit:cover;"
-          >
-        </div>
-      `;
-    } else {
-      imageHTML = `
-        <div class="excursion-image excursion-image-placeholder">
-          <span>LBL</span>
-        </div>
-      `;
-    }
+    const imageHTML = imageURL
+      ? `<img class="trip-cover" src="${escapeHTML(imageURL)}"
+           alt="${escapeHTML(excursion.destination || excursion.title)}"
+           loading="lazy">`
+      : `<div class="trip-cover trip-cover-placeholder">
+           <span>LBL</span>
+           <small>SUA PRÓXIMA VIAGEM</small>
+         </div>`;
 
     card.innerHTML = `
-      ${imageHTML}
+      <div class="trip-image-wrap">
+        ${imageHTML}
+        <span class="trip-category">${escapeHTML(categoryNames[category])}</span>
+      </div>
 
-      <div class="excursion-info">
-        <p class="excursion-destination">
-          ${escapeHTML(excursion.destination)}
-        </p>
-
-        <h3>${escapeHTML(excursion.title)}</h3>
-
-        <p class="excursion-description">
-          ${escapeHTML(
-            excursion.description ||
-            "Entre em contato com nossa equipe para saber mais sobre esta viagem."
-          )}
-        </p>
-
-        <div class="excursion-meta">
-          <span><strong>Saída:</strong> ${escapeHTML(formatDate(excursion.departure_at))}</span>
-          <span><strong>Embarque:</strong> ${escapeHTML(excursion.departure_location || "A confirmar")}</span>
-          <span><strong>Retorno:</strong> ${escapeHTML(formatDate(excursion.return_at))}</span>
+      <div class="excursion-info trip-info">
+        <div class="trip-heading">
+          <p class="excursion-destination">${escapeHTML(excursion.destination || "")}</p>
+          <h3>${escapeHTML(excursion.title || "Próxima excursão")}</h3>
         </div>
 
-        <div class="excursion-bottom">
-          <div class="excursion-price">
+        <div class="trip-dates">
+          <div class="trip-date-box">
+            <span class="trip-date-icon" aria-hidden="true">↗</span>
+            <div>
+              <small>DATA DE VIAGEM</small>
+              <strong>${escapeHTML(formatDate(excursion.departure_at))}</strong>
+            </div>
+          </div>
+
+          <div class="trip-date-box">
+            <span class="trip-date-icon" aria-hidden="true">↩</span>
+            <div>
+              <small>DATA DE RETORNO</small>
+              <strong>${escapeHTML(formatDate(excursion.return_at))}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="trip-boarding">
+          <span aria-hidden="true">⌖</span>
+          <div>
+            <small>LOCAL DE EMBARQUE</small>
+            <strong>${escapeHTML(excursion.departure_location || "A confirmar")}</strong>
+          </div>
+        </div>
+
+        <details class="trip-description">
+          <summary><span class="trip-plus">+</span> Ver descrição completa</summary>
+          <p>${escapeHTML(description)}</p>
+        </details>
+
+        <div class="excursion-bottom trip-bottom">
+          <div class="excursion-price trip-price">
             <small>Valor por pessoa</small>
             <strong>${escapeHTML(formatPrice(excursion.price))}</strong>
           </div>
 
           <button
             type="button"
-            class="button reserve-button"
+            class="button reserve-button trip-reserve"
             data-excursion-id="${escapeHTML(excursion.id)}"
           >
-            Reservar ↗
+            Reservar <span aria-hidden="true">↗</span>
           </button>
         </div>
       </div>
@@ -155,12 +354,10 @@ function renderExcursions(items) {
   excursionsList.querySelectorAll(".reserve-button").forEach(function (button) {
     button.addEventListener("click", function () {
       const excursion = excursions.find(function (item) {
-        return item.id === button.dataset.excursionId;
+        return String(item.id) === button.dataset.excursionId;
       });
 
-      if (excursion) {
-        openReservationDialog(excursion);
-      }
+      if (excursion) openReservationDialog(excursion);
     });
   });
 }
@@ -189,31 +386,22 @@ async function loadExcursions() {
       .gte("departure_at", new Date().toISOString())
       .order("departure_at", { ascending: true });
 
-    if (error) {
-      console.error("Erro ao carregar excursões:", error);
-      showStatus(
-        "Não foi possível carregar as excursões. Atualize a página ou tente novamente.",
-        "error"
-      );
-      return;
-    }
+    if (error) throw error;
 
     excursions = data || [];
 
-    if (excursions.length === 0) {
-      showStatus(
-        "No momento, não há excursões disponíveis. Volte em breve para conferir as próximas viagens!"
-      );
+    if (!excursions.length) {
+      showStatus("No momento, não há excursões disponíveis. Volte em breve!");
+      if (excursionsList) excursionsList.innerHTML = "";
       return;
     }
 
-    showStatus("Confira nossas próximas viagens:");
-    renderExcursions(excursions);
+    buildFilters();
+    applyFilters();
   } catch (error) {
-    console.error("Falha inesperada ao carregar excursões:", error);
-
+    console.error("Erro ao carregar excursões:", error);
     showStatus(
-      "Ocorreu um erro ao carregar as excursões. Tente novamente mais tarde.",
+      "Não foi possível carregar as excursões. Atualize a página ou tente novamente.",
       "error"
     );
   }
@@ -232,13 +420,10 @@ function openReservationDialog(excursion) {
   const feedback = document.getElementById("reservation-feedback");
   const submitButton = document.getElementById("reservation-submit");
 
-  if (idInput) {
-    idInput.value = excursion.id;
-  }
+  if (idInput) idInput.value = excursion.id;
 
   if (details) {
-    details.textContent =
-      excursion.title + " — " + excursion.destination;
+    details.textContent = excursion.title + " — " + excursion.destination;
   }
 
   if (feedback) {
@@ -268,9 +453,7 @@ if (reservationDialog) {
   }
 
   reservationDialog.addEventListener("click", function (event) {
-    if (event.target === reservationDialog) {
-      reservationDialog.close();
-    }
+    if (event.target === reservationDialog) reservationDialog.close();
   });
 }
 
@@ -306,11 +489,7 @@ if (reservationForm) {
       return;
     }
 
-    if (
-      !Number.isInteger(passengerSeats) ||
-      passengerSeats < 1 ||
-      passengerSeats > 20
-    ) {
+    if (!Number.isInteger(passengerSeats) || passengerSeats < 1 || passengerSeats > 20) {
       if (feedback) {
         feedback.textContent = "Selecione uma quantidade válida de passageiros.";
         feedback.className = "form-feedback error";
@@ -329,25 +508,16 @@ if (reservationForm) {
     }
 
     try {
-      const { data, error } = await supabaseClient.rpc(
-        "create_reservation",
-        {
-          p_excursion_id: excursionId,
-          p_passenger_name: passengerName,
-          p_passenger_phone: passengerPhone,
-          p_seats: passengerSeats
-        }
-      );
+      const { data, error } = await supabaseClient.rpc("create_reservation", {
+        p_excursion_id: excursionId,
+        p_passenger_name: passengerName,
+        p_passenger_phone: passengerPhone,
+        p_seats: passengerSeats
+      });
 
-      if (error) {
-        throw new Error(error.message || "Não foi possível enviar sua solicitação.");
-      }
+      if (error) throw new Error(error.message || "Não foi possível enviar sua solicitação.");
 
-      let result = data;
-
-      if (Array.isArray(result)) {
-        result = result[0];
-      }
+      let result = Array.isArray(data) ? data[0] : data;
 
       if (typeof result === "string") {
         try {
@@ -362,40 +532,30 @@ if (reservationForm) {
       }
 
       const code = result && (
-        result.reservation_code ||
-        result.code ||
-        result.reservationCode
+        result.reservation_code || result.code || result.reservationCode
       );
 
       if (feedback) {
         feedback.textContent = code
           ? "Solicitação recebida! Código: " + code +
-            ". A reserva ainda depende da confirmação da equipe LBL. O pagamento será combinado diretamente com a agência."
-          : "Solicitação enviada! A reserva ainda depende da confirmação da equipe LBL. O pagamento será combinado diretamente com a agência.";
+            ". A reserva depende da confirmação da equipe LBL. O pagamento será combinado diretamente com a agência."
+          : "Solicitação enviada! A reserva depende da confirmação da equipe LBL. O pagamento será combinado diretamente com a agência.";
 
         feedback.className = "form-feedback success";
       }
 
-      if (submitButton) {
-        submitButton.textContent = "Solicitação enviada";
-      }
+      if (submitButton) submitButton.textContent = "Solicitação enviada";
     } catch (error) {
       console.error("Erro ao enviar reserva:", error);
 
       if (feedback) {
-        feedback.textContent =
-          error.message || "Erro ao enviar a solicitação. Tente novamente.";
-
+        feedback.textContent = error.message || "Erro ao enviar a solicitação. Tente novamente.";
         feedback.className = "form-feedback error";
       }
 
-      if (submitButton) {
-        submitButton.textContent = "Tentar novamente";
-      }
+      if (submitButton) submitButton.textContent = "Tentar novamente";
     } finally {
-      if (submitButton) {
-        submitButton.disabled = false;
-      }
+      if (submitButton) submitButton.disabled = false;
     }
   });
 }
