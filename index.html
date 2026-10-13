@@ -24,10 +24,10 @@
 
   <link rel="stylesheet" href="style.css">
 
-  <!-- Biblioteca necessária para a integração com o Supabase -->
+  <!-- Biblioteca do Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- Mantém o funcionamento atual das excursões e reservas -->
+  <!-- Sistema de excursões e reservas -->
   <script src="app.js" defer></script>
 </head>
 
@@ -63,6 +63,7 @@
         type="button"
         aria-label="Abrir menu"
         aria-expanded="false"
+        aria-controls="main-nav"
       >
         <span></span>
         <span></span>
@@ -71,7 +72,6 @@
 
     </div>
   </header>
-
 
   <main>
 
@@ -119,7 +119,6 @@
       <div class="hero-bottom-line"></div>
     </section>
 
-
     <!-- DIFERENCIAIS -->
     <section class="features-strip" aria-label="Nossos diferenciais">
       <div class="container features-grid">
@@ -151,20 +150,21 @@
       </div>
     </section>
 
-
-    <!-- EXCURSÕES DISPONÍVEIS -->
+    <!-- PRÓXIMAS EXCURSÕES -->
     <section class="excursions-section section" id="excursions">
       <div class="container">
 
         <div class="section-heading">
           <div class="section-heading-copy">
             <span class="eyebrow">ESCOLHA SEU PRÓXIMO ROTEIRO</span>
+
             <h2>
               PRÓXIMAS <span>EXCURSÕES</span>
             </h2>
+
             <p>
-              Confira os destinos disponíveis e garanta sua reserva
-              de forma simples e prática.
+              Explore os destinos, compare datas e valores e encontre
+              a viagem ideal para você.
             </p>
           </div>
 
@@ -174,6 +174,7 @@
           </div>
         </div>
 
+        <!-- MENSAGEM DE CARREGAMENTO E RESULTADOS -->
         <div
           class="excursions-status"
           id="excursions-status"
@@ -183,21 +184,30 @@
           Carregando excursões...
         </div>
 
-        <div class="excursions-grid" id="excursions-list">
-          <!-- Os cards das excursões são carregados pelo app.js -->
+        <!-- FILTROS CRIADOS AUTOMATICAMENTE PELO APP.JS -->
+        <div id="excursion-filters"></div>
+
+        <!-- CARDS CRIADOS PELO APP.JS COM DADOS DO SUPABASE -->
+        <div
+          class="excursions-grid"
+          id="excursions-list"
+          aria-live="polite"
+        >
+          <!-- As excursões serão carregadas automaticamente. -->
         </div>
 
         <div class="excursions-note">
           <span class="note-icon" aria-hidden="true">ⓘ</span>
+
           <p>
             As vagas são limitadas. Consulte as informações de cada
-            excursão antes de confirmar sua reserva.
+            excursão antes de confirmar sua reserva. O envio do formulário
+            representa uma solicitação, sujeita à confirmação da equipe LBL.
           </p>
         </div>
 
       </div>
     </section>
-
 
     <!-- SOBRE A EMPRESA -->
     <section class="about-section section" id="sobre">
@@ -210,6 +220,7 @@
               alt="Imagem de viagem da LBL Excursões"
               loading="lazy"
             >
+
             <div class="about-image-overlay"></div>
 
             <div class="about-stamp">
@@ -268,13 +279,15 @@
       </div>
     </section>
 
-
     <!-- CHAMADA PARA RESERVAS -->
     <section class="booking-cta">
       <div class="container booking-cta-inner">
+
         <div>
           <span class="eyebrow">A PRÓXIMA HISTÓRIA PODE SER SUA</span>
+
           <h2>VAMOS VIAJAR?</h2>
+
           <p>
             Escolha seu destino, confira as informações e faça sua reserva.
           </p>
@@ -284,9 +297,9 @@
           VER DESTINOS
           <span aria-hidden="true">→</span>
         </a>
+
       </div>
     </section>
-
 
     <!-- CONTATO -->
     <section class="contact-section section" id="contato">
@@ -294,7 +307,11 @@
 
         <div class="contact-copy">
           <span class="eyebrow">FALE COM A GENTE</span>
-          <h2>VAMOS PLANEJAR <span>SUA VIAGEM?</span></h2>
+
+          <h2>
+            VAMOS PLANEJAR <span>SUA VIAGEM?</span>
+          </h2>
+
           <p>
             Consulte as excursões disponíveis e escolha o roteiro
             que combina com você.
@@ -303,12 +320,15 @@
 
         <div class="contact-card">
           <div class="contact-card-icon" aria-hidden="true">✉</div>
+
           <div>
             <h3>RESERVAS E INFORMAÇÕES</h3>
+
             <p>
               Consulte os detalhes de cada excursão e envie sua
               solicitação pelo formulário de reserva.
             </p>
+
             <a href="#excursions" class="text-link">
               VER EXCURSÕES <span aria-hidden="true">→</span>
             </a>
@@ -319,7 +339,6 @@
     </section>
 
   </main>
-
 
   <!-- JANELA DE RESERVA -->
   <dialog class="reservation-dialog" id="reservation-dialog">
@@ -355,6 +374,7 @@
 
         <div class="form-field">
           <label for="passenger-name">Nome completo</label>
+
           <input
             type="text"
             id="passenger-name"
@@ -368,6 +388,7 @@
 
         <div class="form-field">
           <label for="passenger-phone">Telefone / WhatsApp</label>
+
           <input
             type="tel"
             id="passenger-phone"
@@ -381,6 +402,7 @@
 
         <div class="form-field">
           <label for="passenger-seats">Quantidade de lugares</label>
+
           <select
             id="passenger-seats"
             name="seats"
@@ -424,7 +446,6 @@
     </div>
   </dialog>
 
-
   <!-- RODAPÉ -->
   <footer class="site-footer">
     <div class="container footer-main">
@@ -447,6 +468,7 @@
 
       <div class="footer-links">
         <h3>NAVEGAÇÃO</h3>
+
         <a href="#inicio">Início</a>
         <a href="#excursions">Excursões</a>
         <a href="#sobre">Sobre nós</a>
@@ -455,7 +477,11 @@
 
       <div class="footer-links">
         <h3>ENCONTRE SUA VIAGEM</h3>
-        <p>Consulte os roteiros disponíveis e faça sua solicitação de reserva.</p>
+
+        <p>
+          Consulte os roteiros disponíveis e faça sua solicitação de reserva.
+        </p>
+
         <a href="#excursions" class="footer-cta">
           VER EXCURSÕES <span aria-hidden="true">→</span>
         </a>
@@ -465,15 +491,17 @@
 
     <div class="footer-bottom">
       <div class="container footer-bottom-inner">
+
         <p>
           © <span id="current-year"></span> Viação LBL Excursões.
           Todos os direitos reservados.
         </p>
+
         <a href="#inicio">VOLTAR AO TOPO ↑</a>
+
       </div>
     </div>
   </footer>
-
 
   <!-- MENU MOBILE -->
   <script>
@@ -484,8 +512,10 @@
       if (menuButton && navigation) {
         menuButton.addEventListener("click", function () {
           const isOpen = navigation.classList.toggle("is-open");
+
           menuButton.classList.toggle("is-open", isOpen);
           menuButton.setAttribute("aria-expanded", String(isOpen));
+
           menuButton.setAttribute(
             "aria-label",
             isOpen ? "Fechar menu" : "Abrir menu"
@@ -502,21 +532,20 @@
         });
       }
 
-      const year = document.getElementById("current-year");
-      if (year) {
-        year.textContent = new Date().getFullYear();
-      }
-
       const dialog = document.getElementById("reservation-dialog");
       const closeButton = document.getElementById("close-dialog");
 
       if (dialog && closeButton) {
         closeButton.addEventListener("click", function () {
-          dialog.close();
+          if (typeof dialog.close === "function") {
+            dialog.close();
+          } else {
+            dialog.removeAttribute("open");
+          }
         });
 
         dialog.addEventListener("click", function (event) {
-          if (event.target === dialog) {
+          if (event.target === dialog && typeof dialog.close === "function") {
             dialog.close();
           }
         });
