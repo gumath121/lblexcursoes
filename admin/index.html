@@ -1,0 +1,1679 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0a0a">
+
+  <title>Painel Administrativo | LBL Excursões</title>
+
+  <meta name="robots" content="noindex, nofollow">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --bg: #090909;
+      --panel: #141414;
+      --panel2: #1c1c1c;
+      --red: #f01828;
+      --red-dark: #bd101c;
+      --silver: #c8c8c8;
+      --text: #f6f6f6;
+      --muted: #a1a1a1;
+      --border: #303030;
+      --green: #28c76f;
+      --yellow: #ffbf47;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+    }
+
+    button, input, textarea, select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        radial-gradient(ellipse at top, #351015 0%, transparent 50%),
+        var(--bg);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 430px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--red);
+      border-radius: 16px;
+      padding: 34px 28px;
+      box-shadow: 0 20px 70px #0008;
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .brand-mark {
+      width: 64px;
+      height: 64px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 16px;
+      border: 2px solid var(--red);
+      border-radius: 50%;
+      color: var(--red);
+      font-size: 23px;
+      font-weight: 900;
+      letter-spacing: -2px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 25px;
+      letter-spacing: 1px;
+    }
+
+    .brand h1 span {
+      color: var(--red);
+    }
+
+    .brand p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 9px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      color: var(--silver);
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 7px;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      padding: 12px 13px;
+      border-radius: 8px;
+      border: 1px solid #393939;
+      color: white;
+      background: #0e0e0e;
+      outline: none;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      border-color: var(--red);
+    }
+
+    .field textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .field small {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 6px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-weight: 800;
+      transition: .2s;
+    }
+
+    .btn-primary {
+      background: var(--red);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--red-dark);
+    }
+
+    .btn-secondary {
+      background: #292929;
+      border: 1px solid #414141;
+      color: white;
+    }
+
+    .btn-danger {
+      background: #461419;
+      border: 1px solid #84202a;
+      color: #ff9ca4;
+    }
+
+    .btn-small {
+      padding: 8px 11px;
+      font-size: 12px;
+    }
+
+    .full-width {
+      width: 100%;
+    }
+
+    .message {
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 14px 0 0;
+      overflow-wrap: anywhere;
+    }
+
+    .message.error {
+      color: #ff858d;
+    }
+
+    .message.success {
+      color: var(--green);
+    }
+
+    .security-note {
+      color: var(--muted);
+      font-size: 11px;
+      text-align: center;
+      line-height: 1.5;
+      margin-top: 20px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 5%;
+      border-bottom: 1px solid var(--border);
+      background: #101010;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .topbar-title {
+      font-size: 17px;
+      font-weight: 900;
+    }
+
+    .topbar-title span {
+      color: var(--red);
+    }
+
+    .topbar small {
+      display: block;
+      color: var(--muted);
+      margin-top: 5px;
+      font-size: 11px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .container {
+      width: min(1250px, 92%);
+      margin: 30px auto 60px;
+    }
+
+    .welcome {
+      margin-bottom: 25px;
+    }
+
+    .welcome h1 {
+      font-size: clamp(25px, 4vw, 36px);
+      margin: 0 0 8px;
+    }
+
+    .welcome p {
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 9px;
+      font-size: 30px;
+    }
+
+    .section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      margin-bottom: 25px;
+      overflow: hidden;
+    }
+
+    .section-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .section-header h2 {
+      margin: 0;
+      font-size: 19px;
+    }
+
+    .section-body {
+      padding: 20px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0 16px;
+    }
+
+    .span-2 {
+      grid-column: span 2;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--silver);
+      font-size: 13px;
+      margin: 6px 0 20px;
+    }
+
+    .checkbox-row input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--red);
+    }
+
+    .form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .excursion-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 15px;
+    }
+
+    .excursion-item {
+      border: 1px solid var(--border);
+      background: #101010;
+      border-radius: 11px;
+      padding: 17px;
+      min-width: 0;
+    }
+
+    .excursion-item h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      overflow-wrap: anywhere;
+    }
+
+    .excursion-item p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 5px 0;
+      overflow-wrap: anywhere;
+    }
+
+    .excursion-item .price {
+      color: white;
+      font-size: 18px;
+      font-weight: 900;
+      margin: 12px 0;
+    }
+
+    .item-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    .status {
+      display: inline-block;
+      border-radius: 30px;
+      padding: 5px 9px;
+      font-size: 11px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .status.active,
+    .status.confirmed {
+      color: #8af0b5;
+      background: #103c26;
+    }
+
+    .status.inactive,
+    .status.cancelled {
+      color: #ff9ca4;
+      background: #461419;
+    }
+
+    .status.pending {
+      color: #ffdb8a;
+      background: #493719;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 800px;
+      font-size: 13px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 13px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--silver);
+      background: #101010;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    td {
+      color: #e2e2e2;
+      line-height: 1.5;
+    }
+
+    td select {
+      color: white;
+      background: #111;
+      border: 1px solid #414141;
+      border-radius: 6px;
+      padding: 7px;
+      max-width: 140px;
+    }
+
+    .empty {
+      padding: 25px 10px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .section-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      margin-top: 16px;
+    }
+
+    .footer {
+      color: #777;
+      text-align: center;
+      padding: 20px;
+      font-size: 11px;
+    }
+
+    @media (max-width: 720px) {
+      .topbar {
+        padding: 14px 4%;
+        align-items: flex-start;
+      }
+
+      .topbar-title {
+        font-size: 14px;
+      }
+
+      .topbar-actions .btn {
+        padding: 9px;
+        font-size: 11px;
+      }
+
+      .container {
+        width: 94%;
+        margin-top: 22px;
+      }
+
+      .stats {
+        gap: 8px;
+      }
+
+      .stat {
+        padding: 12px;
+      }
+
+      .stat strong {
+        font-size: 24px;
+      }
+
+      .stat span {
+        font-size: 10px;
+      }
+
+      .form-grid,
+      .excursion-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .span-2 {
+        grid-column: span 1;
+      }
+
+      .section-body,
+      .section-header {
+        padding: 15px;
+      }
+
+      .login-card {
+        padding: 27px 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LOGIN -->
+  <section id="login-screen" class="login-screen">
+    <div class="login-card">
+      <div class="brand">
+        <div class="brand-mark">LBL</div>
+        <h1>LBL <span>EXCURSÕES</span></h1>
+        <p>Painel administrativo restrito</p>
+      </div>
+
+      <form id="login-form">
+        <div class="field">
+          <label for="login-email">E-mail administrativo</label>
+          <input
+            id="login-email"
+            type="email"
+            autocomplete="username"
+            required
+            placeholder="Seu e-mail"
+          >
+        </div>
+
+        <div class="field">
+          <label for="login-password">Senha</label>
+          <input
+            id="login-password"
+            type="password"
+            autocomplete="current-password"
+            required
+            placeholder="Sua senha"
+          >
+        </div>
+
+        <button class="btn btn-primary full-width" id="login-button" type="submit">
+          Entrar no painel
+        </button>
+
+        <p id="login-message" class="message" role="status"></p>
+      </form>
+
+      <p class="security-note">
+        Área exclusiva da equipe LBL Excursões.<br>
+        Não compartilhe suas credenciais de acesso.
+      </p>
+    </div>
+  </section>
+
+  <!-- PAINEL -->
+  <div id="admin-panel" class="hidden">
+
+    <header class="topbar">
+      <div class="topbar-title">
+        LBL <span>EXCURSÕES</span>
+        <small>Gerenciamento administrativo</small>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="btn btn-secondary" id="refresh-button" type="button">
+          Atualizar
+        </button>
+
+        <a
+          class="btn btn-secondary"
+          href="../"
+          style="text-decoration:none"
+        >
+          Ver site
+        </a>
+
+        <button class="btn btn-danger" id="logout-button" type="button">
+          Sair
+        </button>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="welcome">
+        <h1>Painel de controle</h1>
+        <p>Cadastre suas viagens e acompanhe as solicitações de reserva.</p>
+        <p id="admin-email-display" class="section-note"></p>
+        <p id="global-message" class="message" role="status"></p>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <span>Excursões cadastradas</span>
+          <strong id="stat-excursions">0</strong>
+        </div>
+
+        <div class="stat">
+          <span>Reservas pendentes</span>
+          <strong id="stat-pending">0</strong>
+        </div>
+
+        <div class="stat">
+          <span>Reservas confirmadas</span>
+          <strong id="stat-confirmed">0</strong>
+        </div>
+      </div>
+
+      <!-- CADASTRO -->
+      <section class="section" id="excursion-editor">
+        <div class="section-header">
+          <h2 id="editor-title">Cadastrar excursão</h2>
+        </div>
+
+        <div class="section-body">
+          <form id="excursion-form">
+            <input id="excursion-id" type="hidden">
+
+            <div class="form-grid">
+              <div class="field">
+                <label for="excursion-title">Nome da excursão *</label>
+                <input
+                  id="excursion-title"
+                  maxlength="150"
+                  required
+                  placeholder="Ex.: Excursão para Aparecida"
+                >
+              </div>
+
+              <div class="field">
+                <label for="excursion-destination">Destino *</label>
+                <input
+                  id="excursion-destination"
+                  maxlength="150"
+                  required
+                  placeholder="Ex.: Aparecida - SP"
+                >
+              </div>
+
+              <div class="field span-2">
+                <label for="excursion-description">Descrição da viagem</label>
+                <textarea
+                  id="excursion-description"
+                  maxlength="5000"
+                  placeholder="Informações sobre a viagem, roteiro, benefícios e orientações."
+                ></textarea>
+              </div>
+
+              <div class="field span-2">
+                <label for="excursion-image">URL da imagem</label>
+                <input
+                  id="excursion-image"
+                  type="url"
+                  maxlength="2000"
+                  placeholder="https://..."
+                >
+                <small>Use o endereço público de uma imagem. O campo é opcional.</small>
+              </div>
+
+              <div class="field span-2">
+                <label for="excursion-departure-location">Local de embarque *</label>
+                <input
+                  id="excursion-departure-location"
+                  maxlength="250"
+                  required
+                  value="Itapetininga/SP"
+                >
+              </div>
+
+              <div class="field">
+                <label for="excursion-departure">Data e hora da saída *</label>
+                <input id="excursion-departure" type="datetime-local" required>
+              </div>
+
+              <div class="field">
+                <label for="excursion-return">Data e hora do retorno *</label>
+                <input id="excursion-return" type="datetime-local" required>
+              </div>
+
+              <div class="field">
+                <label for="excursion-price">Preço por pessoa (R$) *</label>
+                <input
+                  id="excursion-price"
+                  type="number"
+                  min="0"
+                  max="999999"
+                  step="0.01"
+                  required
+                  placeholder="250,00"
+                >
+              </div>
+
+              <div class="field">
+                <label for="excursion-capacity">Total de lugares *</label>
+                <input
+                  id="excursion-capacity"
+                  type="number"
+                  min="1"
+                  max="10000"
+                  step="1"
+                  required
+                  placeholder="46"
+                >
+              </div>
+            </div>
+
+            <label class="checkbox-row">
+              <input id="excursion-active" type="checkbox" checked>
+              Publicar esta excursão no site
+            </label>
+
+            <div class="form-actions">
+              <button class="btn btn-primary" id="save-excursion-button" type="submit">
+                Salvar excursão
+              </button>
+
+              <button class="btn btn-secondary hidden" id="cancel-edit-button" type="button">
+                Cancelar edição
+              </button>
+            </div>
+
+            <p id="excursion-form-message" class="message" role="status"></p>
+          </form>
+        </div>
+      </section>
+
+      <!-- LISTA DE EXCURSÕES -->
+      <section class="section">
+        <div class="section-header">
+          <h2>Excursões cadastradas</h2>
+          <button class="btn btn-secondary btn-small" id="reload-excursions" type="button">
+            Recarregar
+          </button>
+        </div>
+
+        <div class="section-body">
+          <div id="excursions-admin-list" class="excursion-grid">
+            <div class="empty">Carregando excursões...</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESERVAS -->
+      <section class="section">
+        <div class="section-header">
+          <h2>Solicitações de reserva</h2>
+          <button class="btn btn-secondary btn-small" id="reload-reservations" type="button">
+            Recarregar
+          </button>
+        </div>
+
+        <div class="section-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Passageiro</th>
+                  <th>Contato</th>
+                  <th>Excursão</th>
+                  <th>Lugares</th>
+                  <th>Solicitação</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody id="reservations-table-body">
+                <tr>
+                  <td colspan="7" class="empty">Carregando reservas...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="section-note">
+            Reservas novas ficam pendentes. Confirme somente após verificar a solicitação
+            com o passageiro. O pagamento é combinado diretamente com a agência.
+          </p>
+
+          <p id="reservations-message" class="message" role="status"></p>
+        </div>
+      </section>
+
+      <p class="section-note">
+        Importante: alterar o status de uma reserva para confirmada ou cancelada afeta
+        a contagem de vagas disponíveis.
+      </p>
+    </main>
+
+    <footer class="footer">
+      LBL Excursões · Painel administrativo
+    </footer>
+  </div>
+
+  <script>
+    // ==========================================
+    // CONFIGURAÇÃO DO SUPABASE
+    // ==========================================
+
+    const SUPABASE_URL =
+      "https://vguidroxrwujuubflsqr.supabase.co";
+
+    const SUPABASE_PUBLISHABLE_KEY =
+      "sb_publishable_SivSFlZ6Kb3YNh3ohPHeug_nfvDBxT6";
+
+    const db = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
+
+    // ==========================================
+    // ELEMENTOS E ESTADO
+    // ==========================================
+
+    const loginScreen = document.getElementById("login-screen");
+    const adminPanel = document.getElementById("admin-panel");
+    const loginForm = document.getElementById("login-form");
+    const loginButton = document.getElementById("login-button");
+    const loginMessage = document.getElementById("login-message");
+    const globalMessage = document.getElementById("global-message");
+    const excursionForm = document.getElementById("excursion-form");
+
+    let excursionsCache = [];
+    let reservationsCache = [];
+    let loadingPanel = false;
+
+    // ==========================================
+    // FUNÇÕES AUXILIARES
+    // ==========================================
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, function (character) {
+        return {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;"
+        }[character];
+      });
+    }
+
+    function showMessage(element, text, type) {
+      if (!element) return;
+
+      element.textContent = text || "";
+      element.className = "message" + (type ? " " + type : "");
+    }
+
+    function formatDate(value) {
+      if (!value) return "Não informado";
+
+      const date = new Date(value);
+
+      if (Number.isNaN(date.getTime())) return "Data inválida";
+
+      return date.toLocaleString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function formatPrice(value) {
+      return Number(value || 0).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+      });
+    }
+
+    function dateToLocalInput(value) {
+      if (!value) return "";
+
+      const date = new Date(value);
+
+      if (Number.isNaN(date.getTime())) return "";
+
+      const localDate = new Date(
+        date.getTime() - date.getTimezoneOffset() * 60000
+      );
+
+      return localDate.toISOString().slice(0, 16);
+    }
+
+    function statusLabel(status) {
+      const labels = {
+        pending: "Pendente",
+        confirmed: "Confirmada",
+        cancelled: "Cancelada"
+      };
+
+      return labels[status] || status;
+    }
+
+    function statusClass(status) {
+      if (status === "confirmed") return "confirmed";
+      if (status === "cancelled") return "cancelled";
+      return "pending";
+    }
+
+    function getSafeImageURL(value) {
+      if (!value) return "";
+
+      try {
+        const url = new URL(value);
+
+        if (url.protocol === "https:" || url.protocol === "http:") {
+          return url.href;
+        }
+      } catch (error) {
+        return "";
+      }
+
+      return "";
+    }
+
+    // ==========================================
+    // LOGIN E SESSÃO
+    // ==========================================
+
+    function showLogin() {
+      loginScreen.classList.remove("hidden");
+      adminPanel.classList.add("hidden");
+    }
+
+    function showPanel(user) {
+      loginScreen.classList.add("hidden");
+      adminPanel.classList.remove("hidden");
+
+      document.getElementById("admin-email-display").textContent =
+        "Conectado como: " + (user.email || "Administrador");
+
+      loadPanelData();
+    }
+
+    loginForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      loginButton.disabled = true;
+      loginButton.textContent = "Entrando...";
+      showMessage(loginMessage, "", "");
+
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value;
+
+      try {
+        const { data, error } = await db.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) throw error;
+
+        if (!data.user) {
+          throw new Error("Não foi possível identificar a conta.");
+        }
+
+        showMessage(loginMessage, "Login realizado.", "success");
+        showPanel(data.user);
+
+      } catch (error) {
+        console.error("Erro no login:", error);
+
+        showMessage(
+          loginMessage,
+          "Não foi possível entrar. Confira o e-mail e a senha e verifique se essa conta foi cadastrada como administradora no Supabase.",
+          "error"
+        );
+
+      } finally {
+        loginButton.disabled = false;
+        loginButton.textContent = "Entrar no painel";
+      }
+    });
+
+    document.getElementById("logout-button").addEventListener("click", async function () {
+      const { error } = await db.auth.signOut();
+
+      if (error) {
+        showMessage(globalMessage, "Não foi possível encerrar a sessão: " + error.message, "error");
+        return;
+      }
+
+      showLogin();
+    });
+
+    db.auth.onAuthStateChange(function (event, session) {
+      if (session && session.user) {
+        showPanel(session.user);
+      } else {
+        showLogin();
+      }
+    });
+
+    // ==========================================
+    // CARREGAR DADOS DO PAINEL
+    // ==========================================
+
+    async function loadPanelData() {
+      if (loadingPanel) return;
+
+      loadingPanel = true;
+      showMessage(globalMessage, "Atualizando dados...", "");
+
+      try {
+        await Promise.all([
+          loadAdminExcursions(),
+          loadReservations()
+        ]);
+
+        updateStats();
+        showMessage(globalMessage, "Dados atualizados.", "success");
+
+      } catch (error) {
+        console.error(error);
+        showMessage(globalMessage, "Erro ao atualizar os dados.", "error");
+
+      } finally {
+        loadingPanel = false;
+      }
+    }
+
+    async function loadAdminExcursions() {
+      const list = document.getElementById("excursions-admin-list");
+
+      list.innerHTML = '<div class="empty">Carregando excursões...</div>';
+
+      const { data, error } = await db
+        .from("excursions")
+        .select("*")
+        .order("departure_at", { ascending: true });
+
+      if (error) {
+        console.error("Erro ao carregar excursões:", error);
+        list.innerHTML =
+          '<div class="empty">Não foi possível carregar as excursões. Confira as permissões administrativas no Supabase.</div>';
+        throw error;
+      }
+
+      excursionsCache = data || [];
+      renderExcursions();
+    }
+
+    // ==========================================
+    // EXIBIR EXCURSÕES
+    // ==========================================
+
+    function renderExcursions() {
+      const list = document.getElementById("excursions-admin-list");
+
+      if (!excursionsCache.length) {
+        list.innerHTML =
+          '<div class="empty">Nenhuma excursão cadastrada. Use o formulário acima para adicionar a primeira viagem.</div>';
+        return;
+      }
+
+      list.innerHTML = excursionsCache.map(function (excursion) {
+        const active = excursion.active === true;
+
+        const imageURL = getSafeImageURL(excursion.image_url);
+
+        const imageHTML = imageURL
+          ? '<img src="' + escapeHTML(imageURL) +
+            '" alt="" loading="lazy" style="width:100%;height:150px;object-fit:cover;border-radius:8px;margin-bottom:12px">'
+          : "";
+
+        return `
+          <article class="excursion-item">
+            ${imageHTML}
+
+            <span class="status ${active ? "active" : "inactive"}">
+              ${active ? "Publicada" : "Não publicada"}
+            </span>
+
+            <h3>${escapeHTML(excursion.title)}</h3>
+
+            <p><strong>Destino:</strong> ${escapeHTML(excursion.destination)}</p>
+            <p><strong>Saída:</strong> ${escapeHTML(formatDate(excursion.departure_at))}</p>
+            <p><strong>Retorno:</strong> ${escapeHTML(formatDate(excursion.return_at))}</p>
+            <p><strong>Embarque:</strong> ${escapeHTML(excursion.departure_location || "A confirmar")}</p>
+            <p><strong>Capacidade:</strong> ${escapeHTML(excursion.capacity)} lugares</p>
+
+            <div class="price">${escapeHTML(formatPrice(excursion.price))} <small style="font-size:11px;color:#aaa">por pessoa</small></div>
+
+            <div class="item-actions">
+              <button
+                class="btn btn-secondary btn-small"
+                type="button"
+                data-action="edit"
+                data-id="${escapeHTML(excursion.id)}"
+              >Editar</button>
+
+              <button
+                class="btn ${active ? "btn-danger" : "btn-primary"} btn-small"
+                type="button"
+                data-action="toggle"
+                data-id="${escapeHTML(excursion.id)}"
+              >${active ? "Despublicar" : "Publicar"}</button>
+
+              <button
+                class="btn btn-danger btn-small"
+                type="button"
+                data-action="delete"
+                data-id="${escapeHTML(excursion.id)}"
+              >Excluir</button>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      list.querySelectorAll("button[data-action]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          const id = button.dataset.id;
+          const action = button.dataset.action;
+
+          if (action === "edit") editExcursion(id);
+          if (action === "toggle") toggleExcursion(id);
+          if (action === "delete") deleteExcursion(id);
+        });
+      });
+    }
+
+    // ==========================================
+    // CADASTRAR E EDITAR EXCURSÃO
+    // ==========================================
+
+    excursionForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      const saveButton = document.getElementById("save-excursion-button");
+
+      const id = document.getElementById("excursion-id").value.trim();
+      const title = document.getElementById("excursion-title").value.trim();
+      const destination = document.getElementById("excursion-destination").value.trim();
+      const description = document.getElementById("excursion-description").value.trim();
+      const imageURL = document.getElementById("excursion-image").value.trim();
+      const departureLocation = document.getElementById("excursion-departure-location").value.trim();
+      const departureValue = document.getElementById("excursion-departure").value;
+      const returnValue = document.getElementById("excursion-return").value;
+      const price = Number(document.getElementById("excursion-price").value);
+      const capacity = Number(document.getElementById("excursion-capacity").value);
+      const active = document.getElementById("excursion-active").checked;
+
+      const departureDate = new Date(departureValue);
+      const returnDate = new Date(returnValue);
+
+      if (
+        !title ||
+        !destination ||
+        !departureLocation ||
+        !departureValue ||
+        !returnValue
+      ) {
+        showMessage(
+          document.getElementById("excursion-form-message"),
+          "Preencha todos os campos obrigatórios.",
+          "error"
+        );
+        return;
+      }
+
+      if (
+        Number.isNaN(departureDate.getTime()) ||
+        Number.isNaN(returnDate.getTime()) ||
+        returnDate <= departureDate
+      ) {
+        showMessage(
+          document.getElementById("excursion-form-message"),
+          "A data e hora do retorno precisam ser posteriores à saída.",
+          "error"
+        );
+        return;
+      }
+
+      if (
+        !Number.isFinite(price) ||
+        price < 0 ||
+        !Number.isInteger(capacity) ||
+        capacity < 1
+      ) {
+        showMessage(
+          document.getElementById("excursion-form-message"),
+          "Informe um preço válido e uma capacidade de pelo menos um lugar.",
+          "error"
+        );
+        return;
+      }
+
+      if (imageURL && !getSafeImageURL(imageURL)) {
+        showMessage(
+          document.getElementById("excursion-form-message"),
+          "A imagem precisa ter uma URL válida começando com http:// ou https://.",
+          "error"
+        );
+        return;
+      }
+
+      const payload = {
+        title,
+        destination,
+        description: description || null,
+        image_url: imageURL || null,
+        departure_location: departureLocation,
+        departure_at: departureDate.toISOString(),
+        return_at: returnDate.toISOString(),
+        price,
+        capacity,
+        active
+      };
+
+      saveButton.disabled = true;
+      saveButton.textContent = "Salvando...";
+
+      showMessage(
+        document.getElementById("excursion-form-message"),
+        "Salvando excursão...",
+        ""
+      );
+
+      try {
+        let result;
+
+        if (id) {
+          result = await db
+            .from("excursions")
+            .update(payload)
+            .eq("id", id)
+            .select("id");
+
+        } else {
+          result = await db
+            .from("excursions")
+            .insert(payload)
+            .select("id");
+        }
+
+        if (result.error) throw result.error;
+
+        if (!result.data || result.data.length === 0) {
+          throw new Error(
+            "Nenhuma alteração foi confirmada. Verifique se sua conta tem permissão de administrador."
+          );
+        }
+
+        showMessage(
+          document.getElementById("excursion-form-message"),
+          id
+            ? "Excursão atualizada com sucesso!"
+            : "Excursão cadastrada com sucesso!",
+          "success"
+        );
+
+        resetExcursionForm();
+        await loadAdminExcursions();
+        updateStats();
+
+      } catch (error) {
+        console.error("Erro ao salvar excursão:", error);
+
+        showMessage(
+          document.getElementById("excursion-form-message"),
+          "Não foi possível salvar: " + (error.message || "verifique as permissões no Supabase."),
+          "error"
+        );
+
+      } finally {
+        saveButton.disabled = false;
+        saveButton.textContent = "Salvar excursão";
+      }
+    });
+
+    function editExcursion(id) {
+      const excursion = excursionsCache.find(function (item) {
+        return item.id === id;
+      });
+
+      if (!excursion) return;
+
+      document.getElementById("excursion-id").value = excursion.id;
+      document.getElementById("excursion-title").value = excursion.title || "";
+      document.getElementById("excursion-destination").value = excursion.destination || "";
+      document.getElementById("excursion-description").value = excursion.description || "";
+      document.getElementById("excursion-image").value = excursion.image_url || "";
+      document.getElementById("excursion-departure-location").value =
+        excursion.departure_location || "Itapetininga/SP";
+      document.getElementById("excursion-departure").value =
+        dateToLocalInput(excursion.departure_at);
+      document.getElementById("excursion-return").value =
+        dateToLocalInput(excursion.return_at);
+      document.getElementById("excursion-price").value = excursion.price;
+      document.getElementById("excursion-capacity").value = excursion.capacity;
+      document.getElementById("excursion-active").checked = excursion.active === true;
+
+      document.getElementById("editor-title").textContent = "Editar excursão";
+      document.getElementById("save-excursion-button").textContent = "Salvar alterações";
+      document.getElementById("cancel-edit-button").classList.remove("hidden");
+
+      showMessage(document.getElementById("excursion-form-message"), "", "");
+
+      document.getElementById("excursion-editor").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }
+
+    function resetExcursionForm() {
+      excursionForm.reset();
+
+      document.getElementById("excursion-id").value = "";
+      document.getElementById("excursion-departure-location").value = "Itapetininga/SP";
+      document.getElementById("excursion-active").checked = true;
+      document.getElementById("editor-title").textContent = "Cadastrar excursão";
+      document.getElementById("save-excursion-button").textContent = "Salvar excursão";
+      document.getElementById("cancel-edit-button").classList.add("hidden");
+    }
+
+    document.getElementById("cancel-edit-button").addEventListener("click", function () {
+      resetExcursionForm();
+      showMessage(document.getElementById("excursion-form-message"), "", "");
+    });
+
+    // ==========================================
+    // PUBLICAR / DESPUBLICAR
+    // ==========================================
+
+    async function toggleExcursion(id) {
+      const excursion = excursionsCache.find(function (item) {
+        return item.id === id;
+      });
+
+      if (!excursion) return;
+
+      const nextValue = !excursion.active;
+
+      const confirmed = window.confirm(
+        nextValue
+          ? "Deseja publicar esta excursão no site?"
+          : "Deseja retirar esta excursão do site?"
+      );
+
+      if (!confirmed) return;
+
+      const { data, error } = await db
+        .from("excursions")
+        .update({ active: nextValue })
+        .eq("id", id)
+        .select("id");
+
+      if (error || !data || data.length === 0) {
+        showMessage(
+          globalMessage,
+          "Não foi possível alterar a publicação: " +
+            (error ? error.message : "permissão insuficiente."),
+          "error"
+        );
+        return;
+      }
+
+      showMessage(globalMessage, "Publicação atualizada.", "success");
+      await loadAdminExcursions();
+    }
+
+    // ==========================================
+    // EXCLUIR EXCURSÃO
+    // ==========================================
+
+    async function deleteExcursion(id) {
+      const excursion = excursionsCache.find(function (item) {
+        return item.id === id;
+      });
+
+      if (!excursion) return;
+
+      const hasReservations = reservationsCache.some(function (reservation) {
+        return reservation.excursion_id === id;
+      });
+
+      if (hasReservations) {
+        alert(
+          "Esta excursão possui reservas registradas e não pode ser excluída por este painel. Despublique-a se não quiser mais exibi-la no site."
+        );
+        return;
+      }
+
+      const confirmed = window.confirm(
+        'Tem certeza de que deseja excluir a excursão "' +
+        excursion.title +
+        '"? Esta ação não pode ser desfeita.'
+      );
+
+      if (!confirmed) return;
+
+      const { data, error } = await db
+        .from("excursions")
+        .delete()
+        .eq("id", id)
+        .select("id");
+
+      if (error || !data || data.length === 0) {
+        showMessage(
+          globalMessage,
+          "Não foi possível excluir: " +
+            (error ? error.message : "permissão insuficiente."),
+          "error"
+        );
+        return;
+      }
+
+      showMessage(globalMessage, "Excursão excluída.", "success");
+      await loadAdminExcursions();
+      updateStats();
+    }
+
+    // ==========================================
+    // CARREGAR RESERVAS
+    // ==========================================
+
+    async function loadReservations() {
+      const tbody = document.getElementById("reservations-table-body");
+
+      tbody.innerHTML =
+        '<tr><td colspan="7" class="empty">Carregando reservas...</td></tr>';
+
+      const { data, error } = await db
+        .from("reservations")
+        .select(`
+          id,
+          reservation_code,
+          excursion_id,
+          passenger_name,
+          passenger_phone,
+          seats,
+          status,
+          created_at,
+          excursions (
+            title,
+            destination,
+            departure_at
+          )
+        `)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Erro ao carregar reservas:", error);
+
+        tbody.innerHTML =
+          '<tr><td colspan="7" class="empty">Não foi possível carregar as reservas. Confira as permissões administrativas no Supabase.</td></tr>';
+
+        throw error;
+      }
+
+      reservationsCache = data || [];
+      renderReservations();
+    }
+
+    function renderReservations() {
+      const tbody = document.getElementById("reservations-table-body");
+
+      if (!reservationsCache.length) {
+        tbody.innerHTML =
+          '<tr><td colspan="7" class="empty">Ainda não há solicitações de reserva.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = reservationsCache.map(function (reservation) {
+        const excursion = reservation.excursions || {};
+        const code = reservation.reservation_code || reservation.id;
+
+        return `
+          <tr>
+            <td>
+              <strong>${escapeHTML(code)}</strong>
+            </td>
+
+            <td>${escapeHTML(reservation.passenger_name)}</td>
+
+            <td>${escapeHTML(reservation.passenger_phone)}</td>
+
+            <td>
+              ${escapeHTML(excursion.title || "Excursão")}
+              <br>
+              <small style="color:#aaa">
+                ${escapeHTML(excursion.destination || "")}
+              </small>
+              <br>
+              <small style="color:#aaa">
+                ${escapeHTML(formatDate(excursion.departure_at))}
+              </small>
+            </td>
+
+            <td>${escapeHTML(reservation.seats)}</td>
+
+            <td>${escapeHTML(formatDate(reservation.created_at))}</td>
+
+            <td>
+              <span class="status ${statusClass(reservation.status)}">
+                ${escapeHTML(statusLabel(reservation.status))}
+              </span>
+
+              <br>
+
+              <select
+                aria-label="Alterar status da reserva ${escapeHTML(code)}"
+                data-reservation-status="${escapeHTML(reservation.id)}"
+              >
+                <option value="pending" ${reservation.status === "pending" ? "selected" : ""}>Pendente</option>
+                <option value="confirmed" ${reservation.status === "confirmed" ? "selected" : ""}>Confirmada</option>
+                <option value="cancelled" ${reservation.status === "cancelled" ? "selected" : ""}>Cancelada</option>
+              </select>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      tbody.querySelectorAll("select[data-reservation-status]").forEach(function (select) {
+        select.addEventListener("change", async function () {
+          const id = select.dataset.reservationStatus;
+          const newStatus = select.value;
+
+          await updateReservationStatus(id, newStatus, select);
+        });
+      });
+    }
+
+    // ==========================================
+    // ATUALIZAR STATUS DA RESERVA
+    // ==========================================
+
+    async function updateReservationStatus(id, newStatus, select) {
+      const reservation = reservationsCache.find(function (item) {
+        return item.id === id;
+      });
+
+      if (!reservation) return;
+
+      const oldStatus = reservation.status;
+
+      if (oldStatus === newStatus) return;
+
+      const label = statusLabel(newStatus);
+
+      const confirmed = window.confirm(
+        "Deseja alterar o status desta reserva para " + label + "?"
+      );
+
+      if (!confirmed) {
+        select.value = oldStatus;
+        return;
+      }
+
+      select.disabled = true;
+
+      showMessage(
+        document.getElementById("reservations-message"),
+        "Atualizando status da reserva...",
+        ""
+      );
+
+      try {
+        const { data, error } = await db
+          .from("reservations")
+          .update({ status: newStatus })
+          .eq("id", id)
+          .select("id");
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          throw new Error("A alteração não foi confirmada. Verifique suas permissões.");
+        }
+
+        showMessage(
+          document.getElementById("reservations-message"),
+          "Reserva atualizada para: " + label + ".",
+          "success"
+        );
+
+        await loadReservations();
+        updateStats();
+
+      } catch (error) {
+        console.error("Erro ao atualizar reserva:", error);
+
+        showMessage(
+          document.getElementById("reservations-message"),
+          "Não foi possível atualizar: " + (error.message || "erro desconhecido."),
+          "error"
+        );
+
+        select.value = oldStatus;
+
+      } finally {
+        select.disabled = false;
+      }
+    }
+
+    // ==========================================
+    // CONTADORES E ATUALIZAÇÃO MANUAL
+    // ==========================================
+
+    function updateStats() {
+      document.getElementById("stat-excursions").textContent =
+        excursionsCache.length;
+
+      document.getElementById("stat-pending").textContent =
+        reservationsCache.filter(function (reservation) {
+          return reservation.status === "pending";
+        }).length;
+
+      document.getElementById("stat-confirmed").textContent =
+        reservationsCache.filter(function (reservation) {
+          return reservation.status === "confirmed";
+        }).length;
+    }
+
+    document.getElementById("refresh-button").addEventListener("click", loadPanelData);
+
+    document.getElementById("reload-excursions").addEventListener("click", async function () {
+      try {
+        await loadAdminExcursions();
+        updateStats();
+      } catch (error) {
+        showMessage(globalMessage, "Erro ao recarregar excursões.", "error");
+      }
+    });
+
+    document.getElementById("reload-reservations").addEventListener("click", async function () {
+      try {
+        await loadReservations();
+        updateStats();
+      } catch (error) {
+        showMessage(
+          document.getElementById("reservations-message"),
+          "Erro ao recarregar reservas.",
+          "error"
+        );
+      }
+    });
+  </script>
+</body>
+</html>
+```
