@@ -1,10 +1,4 @@
-```javascript
-// ============================================
-// CONFIGURAÇÃO DO SUPABASE
-// ============================================
-
 const SUPABASE_URL = "https://vguidroxrwujuubflsqr.supabase.co";
-
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_SivSFlZ6Kb3YNh3ohPHeug_nfvDBxT6";
 
 const supabaseClient = window.supabase.createClient(
@@ -12,23 +6,15 @@ const supabaseClient = window.supabase.createClient(
   SUPABASE_PUBLISHABLE_KEY
 );
 
-// ============================================
-// ELEMENTOS DA PÁGINA
-// ============================================
-
 const excursionsList = document.getElementById("excursions-list");
 const excursionsStatus = document.getElementById("excursions-status");
 const reservationDialog = document.getElementById("reservation-dialog");
 const reservationForm = document.getElementById("reservation-form");
 
-let selectedExcursion = null;
-
-// ============================================
-// FUNÇÕES AUXILIARES
-// ============================================
+let excursions = [];
 
 function escapeHTML(value) {
-  return String(value ?? "").replace(/[&<>"']/g, function (character) {
+  return String(value ?? "").replace(/[&<>"']/g, function (char) {
     const entities = {
       "&": "&amp;",
       "<": "&lt;",
@@ -37,14 +23,14 @@ function escapeHTML(value) {
       "'": "&#039;"
     };
 
-    return entities[character];
+    return entities[char];
   });
 }
 
-function formatDate(dateValue) {
-  if (!dateValue) return "A confirmar";
+function formatDate(value) {
+  if (!value) return "A confirmar";
 
-  const date = new Date(dateValue);
+  const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) return "A confirmar";
 
@@ -57,21 +43,21 @@ function formatDate(dateValue) {
   });
 }
 
-function formatPrice(price) {
-  return Number(price).toLocaleString("pt-BR", {
+function formatPrice(value) {
+  return Number(value || 0).toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL"
   });
 }
 
-function getSafeImageURL(url) {
-  if (!url) return "";
+function safeImageURL(value) {
+  if (!value) return "";
 
   try {
-    const parsedURL = new URL(url);
+    const url = new URL(value);
 
-    if (parsedURL.protocol === "https:" || parsedURL.protocol === "http:") {
-      return parsedURL.href;
+    if (url.protocol === "https:" || url.protocol === "http:") {
+      return url.href;
     }
   } catch (error) {
     return "";
@@ -80,129 +66,84 @@ function getSafeImageURL(url) {
   return "";
 }
 
-// ============================================
-// CARREGAR EXCURSÕES
-// ============================================
+function showStatus(message, type) {
+  if (!excursionsStatus) return;
 
-async function loadExcursions() {
+  excursionsStatus.textContent = message;
+  excursionsStatus.className = "status-message";
+
+  if (type) {
+    excursionsStatus.classList.add(type);
+  }
+}
+
+function renderExcursions(items) {
   if (!excursionsList) return;
 
   excursionsList.innerHTML = "";
-  
-  if (excursionsStatus) {
-    excursionsStatus.textContent = "Carregando excursões...";
-  }
 
-  const { data, error } = await supabaseClient
-    .from("excursions")
-    .select(`
-      id,
-      title,
-      destination,
-      description,
-      image_url,
-      departure_location,
-      departure_at,
-      return_at,
-      price,
-      capacity
-    `)
-    .eq("active", true)
-    .gte("departure_at", new Date().toISOString())
-    .order("departure_at", { ascending: true });
-
-  if (error) {
-    console.error("Erro ao carregar excursões:", error);
-
-    if (excursionsStatus) {
-      excursionsStatus.textContent =
-        "Não foi possível carregar as excursões. Tente novamente mais tarde.";
-    }
-
-    return;
-  }
-
-  if (!data || data.length === 0) {
-    if (excursionsStatus) {
-      excursionsStatus.textContent =
-        "No momento, não há excursões disponíveis. Volte em breve para conferir as próximas viagens!";
-    }
-
-    return;
-  }
-
-  if (excursionsStatus) {
-    excursionsStatus.textContent = "Confira nossas próximas viagens:";
-  }
-
-  data.forEach(function (excursion) {
+  items.forEach(function (excursion) {
     const card = document.createElement("article");
     card.className = "excursion-card";
 
-    const imageURL = getSafeImageURL(excursion.image_url);
+    const imageURL = safeImageURL(excursion.image_url);
 
-    const imageHTML = imageURL
-      ? `
+    let imageHTML;
+
+    if (imageURL) {
+      imageHTML = `
         <div class="excursion-image">
           <img
             src="${escapeHTML(imageURL)}"
             alt="${escapeHTML(excursion.destination)}"
             loading="lazy"
+            style="width:100%;height:100%;object-fit:cover;"
           >
         </div>
-      `
-      : `
+      `;
+    } else {
+      imageHTML = `
         <div class="excursion-image excursion-image-placeholder">
-          <span>LBL EXCURSÕES</span>
+          <span>LBL</span>
         </div>
       `;
+    }
 
     card.innerHTML = `
       ${imageHTML}
 
-      <div class="excursion-card-content">
-        <p class="excursion-label">PRÓXIMA VIAGEM</p>
-
-        <h3>${escapeHTML(excursion.title)}</h3>
-
+      <div class="excursion-info">
         <p class="excursion-destination">
           ${escapeHTML(excursion.destination)}
         </p>
 
+        <h3>${escapeHTML(excursion.title)}</h3>
+
         <p class="excursion-description">
-          ${escapeHTML(excursion.description || "Entre em contato para saber mais sobre esta viagem.")}
+          ${escapeHTML(
+            excursion.description ||
+            "Entre em contato com nossa equipe para saber mais sobre esta viagem."
+          )}
         </p>
 
-        <div class="excursion-details">
-          <p>
-            <strong>Saída:</strong><br>
-            ${escapeHTML(formatDate(excursion.departure_at))}
-          </p>
-
-          <p>
-            <strong>Local de embarque:</strong><br>
-            ${escapeHTML(excursion.departure_location || "A confirmar")}
-          </p>
-
-          <p>
-            <strong>Retorno previsto:</strong><br>
-            ${escapeHTML(formatDate(excursion.return_at))}
-          </p>
+        <div class="excursion-meta">
+          <span><strong>Saída:</strong> ${escapeHTML(formatDate(excursion.departure_at))}</span>
+          <span><strong>Embarque:</strong> ${escapeHTML(excursion.departure_location || "A confirmar")}</span>
+          <span><strong>Retorno:</strong> ${escapeHTML(formatDate(excursion.return_at))}</span>
         </div>
 
-        <div class="excursion-card-footer">
+        <div class="excursion-bottom">
           <div class="excursion-price">
-            <span>A partir de</span>
+            <small>Valor por pessoa</small>
             <strong>${escapeHTML(formatPrice(excursion.price))}</strong>
-            <small>por pessoa</small>
           </div>
 
           <button
-            class="btn btn-primary reserve-button"
             type="button"
+            class="button reserve-button"
             data-excursion-id="${escapeHTML(excursion.id)}"
           >
-            Reservar
+            Reservar ↗
           </button>
         </div>
       </div>
@@ -213,7 +154,7 @@ async function loadExcursions() {
 
   excursionsList.querySelectorAll(".reserve-button").forEach(function (button) {
     button.addEventListener("click", function () {
-      const excursion = data.find(function (item) {
+      const excursion = excursions.find(function (item) {
         return item.id === button.dataset.excursionId;
       });
 
@@ -224,38 +165,90 @@ async function loadExcursions() {
   });
 }
 
-// ============================================
-// ABRIR FORMULÁRIO DE RESERVA
-// ============================================
+async function loadExcursions() {
+  if (!excursionsList) return;
+
+  showStatus("Carregando excursões...");
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("excursions")
+      .select(`
+        id,
+        title,
+        destination,
+        description,
+        image_url,
+        departure_location,
+        departure_at,
+        return_at,
+        price,
+        capacity
+      `)
+      .eq("active", true)
+      .gte("departure_at", new Date().toISOString())
+      .order("departure_at", { ascending: true });
+
+    if (error) {
+      console.error("Erro ao carregar excursões:", error);
+      showStatus(
+        "Não foi possível carregar as excursões. Atualize a página ou tente novamente.",
+        "error"
+      );
+      return;
+    }
+
+    excursions = data || [];
+
+    if (excursions.length === 0) {
+      showStatus(
+        "No momento, não há excursões disponíveis. Volte em breve para conferir as próximas viagens!"
+      );
+      return;
+    }
+
+    showStatus("Confira nossas próximas viagens:");
+    renderExcursions(excursions);
+  } catch (error) {
+    console.error("Falha inesperada ao carregar excursões:", error);
+
+    showStatus(
+      "Ocorreu um erro ao carregar as excursões. Tente novamente mais tarde.",
+      "error"
+    );
+  }
+}
 
 function openReservationDialog(excursion) {
-  selectedExcursion = excursion;
-
   if (!reservationDialog || !reservationForm) {
-    alert("O formulário de reserva não foi encontrado na página.");
+    alert("Não foi possível abrir o formulário de reserva.");
     return;
   }
 
   reservationForm.reset();
 
-  const excursionIdInput = document.getElementById("reservation-excursion-id");
+  const idInput = document.getElementById("reservation-excursion-id");
+  const details = document.getElementById("reservation-details");
+  const feedback = document.getElementById("reservation-feedback");
+  const submitButton = document.getElementById("reservation-submit");
 
-  if (excursionIdInput) {
-    excursionIdInput.value = excursion.id;
+  if (idInput) {
+    idInput.value = excursion.id;
   }
 
-  const excursionName = document.getElementById("reservation-excursion-name");
-
-  if (excursionName) {
-    excursionName.textContent =
+  if (details) {
+    details.textContent =
       excursion.title + " — " + excursion.destination;
   }
 
-  const message = document.getElementById("reservation-message");
+  if (feedback) {
+    feedback.textContent = "";
+    feedback.className = "form-feedback";
+  }
 
-  if (message) {
-    message.textContent = "";
-    message.className = "";
+  if (submitButton) {
+    submitButton.disabled = false;
+    submitButton.textContent = "Enviar solicitação ↗";
   }
 
   if (typeof reservationDialog.showModal === "function") {
@@ -265,39 +258,21 @@ function openReservationDialog(excursion) {
   }
 }
 
-// ============================================
-// FECHAR FORMULÁRIO DE RESERVA
-// ============================================
-
 if (reservationDialog) {
-  const closeButtons = reservationDialog.querySelectorAll(
-    "[data-close-dialog], .dialog-close, .close-dialog"
-  );
+  const closeButton = document.getElementById("close-dialog");
 
-  closeButtons.forEach(function (button) {
-    button.addEventListener("click", function () {
-      if (typeof reservationDialog.close === "function") {
-        reservationDialog.close();
-      } else {
-        reservationDialog.removeAttribute("open");
-      }
+  if (closeButton) {
+    closeButton.addEventListener("click", function () {
+      reservationDialog.close();
     });
-  });
+  }
 
   reservationDialog.addEventListener("click", function (event) {
     if (event.target === reservationDialog) {
-      if (typeof reservationDialog.close === "function") {
-        reservationDialog.close();
-      } else {
-        reservationDialog.removeAttribute("open");
-      }
+      reservationDialog.close();
     }
   });
 }
-
-// ============================================
-// ENVIAR PEDIDO DE RESERVA
-// ============================================
 
 if (reservationForm) {
   reservationForm.addEventListener("submit", async function (event) {
@@ -306,51 +281,40 @@ if (reservationForm) {
     const nameInput = document.getElementById("passenger-name");
     const phoneInput = document.getElementById("passenger-phone");
     const seatsInput = document.getElementById("passenger-seats");
-    const excursionIdInput = document.getElementById("reservation-excursion-id");
-    const submitButton = reservationForm.querySelector(
-      'button[type="submit"], input[type="submit"]'
-    );
-    const message = document.getElementById("reservation-message");
+    const idInput = document.getElementById("reservation-excursion-id");
+    const feedback = document.getElementById("reservation-feedback");
+    const submitButton = document.getElementById("reservation-submit");
 
-    if (!nameInput || !phoneInput || !seatsInput || !excursionIdInput) {
-      if (message) {
-        message.textContent =
-          "Não foi possível localizar todos os campos do formulário.";
-        message.className = "error";
+    if (!nameInput || !phoneInput || !seatsInput || !idInput) {
+      if (feedback) {
+        feedback.textContent = "Não foi possível localizar os campos do formulário.";
+        feedback.className = "form-feedback error";
       }
-
       return;
     }
 
     const passengerName = nameInput.value.trim();
     const passengerPhone = phoneInput.value.trim();
     const passengerSeats = Number(seatsInput.value);
-    const excursionId = excursionIdInput.value;
+    const excursionId = idInput.value;
 
-    if (!passengerName || !passengerPhone) {
-      if (message) {
-        message.textContent = "Preencha seu nome e telefone.";
-        message.className = "error";
+    if (!passengerName || !passengerPhone || !excursionId) {
+      if (feedback) {
+        feedback.textContent = "Preencha seu nome, telefone e selecione uma excursão.";
+        feedback.className = "form-feedback error";
       }
-
       return;
     }
 
-    if (!Number.isInteger(passengerSeats) || passengerSeats < 1 || passengerSeats > 20) {
-      if (message) {
-        message.textContent = "Selecione uma quantidade válida de lugares.";
-        message.className = "error";
+    if (
+      !Number.isInteger(passengerSeats) ||
+      passengerSeats < 1 ||
+      passengerSeats > 20
+    ) {
+      if (feedback) {
+        feedback.textContent = "Selecione uma quantidade válida de passageiros.";
+        feedback.className = "form-feedback error";
       }
-
-      return;
-    }
-
-    if (!excursionId) {
-      if (message) {
-        message.textContent = "Selecione uma excursão antes de continuar.";
-        message.className = "error";
-      }
-
       return;
     }
 
@@ -359,9 +323,9 @@ if (reservationForm) {
       submitButton.textContent = "Enviando...";
     }
 
-    if (message) {
-      message.textContent = "Enviando seu pedido de reserva...";
-      message.className = "";
+    if (feedback) {
+      feedback.textContent = "Enviando sua solicitação...";
+      feedback.className = "form-feedback";
     }
 
     try {
@@ -376,10 +340,7 @@ if (reservationForm) {
       );
 
       if (error) {
-        console.error("Erro na reserva:", error);
-        throw new Error(
-          error.message || "Não foi possível registrar sua reserva."
-        );
+        throw new Error(error.message || "Não foi possível enviar sua solicitação.");
       }
 
       let result = data;
@@ -396,65 +357,53 @@ if (reservationForm) {
         }
       }
 
-      if (!result || result.success === false || result.error) {
-        throw new Error(
-          result && (result.error || result.message)
-            ? result.error || result.message
-            : "Não foi possível confirmar o recebimento do pedido."
-        );
+      if (result && (result.success === false || result.error)) {
+        throw new Error(result.error || result.message || "A reserva não foi aceita.");
       }
 
-      const reservationCode =
+      const code = result && (
         result.reservation_code ||
         result.code ||
-        result.reservationCode ||
-        "";
+        result.reservationCode
+      );
 
-      if (message) {
-        message.className = "success";
-        message.textContent = reservationCode
-          ? "Pedido recebido! Seu código é " + reservationCode +
-            ". Sua reserva ficará pendente até a confirmação da agência. Aguarde nosso contato para combinar o pagamento."
-          : "Pedido enviado! Sua reserva ficará pendente até a confirmação da agência. Aguarde nosso contato para combinar o pagamento.";
+      if (feedback) {
+        feedback.textContent = code
+          ? "Solicitação recebida! Código: " + code +
+            ". A reserva ainda depende da confirmação da equipe LBL. O pagamento será combinado diretamente com a agência."
+          : "Solicitação enviada! A reserva ainda depende da confirmação da equipe LBL. O pagamento será combinado diretamente com a agência.";
+
+        feedback.className = "form-feedback success";
       }
-
-      reservationForm.reset();
 
       if (submitButton) {
-        submitButton.textContent = "Pedido enviado";
+        submitButton.textContent = "Solicitação enviada";
       }
-
     } catch (error) {
-      console.error(error);
+      console.error("Erro ao enviar reserva:", error);
 
-      if (message) {
-        message.className = "error";
-        message.textContent =
-          error.message ||
-          "Ocorreu um erro ao enviar sua reserva. Tente novamente.";
+      if (feedback) {
+        feedback.textContent =
+          error.message || "Erro ao enviar a solicitação. Tente novamente.";
+
+        feedback.className = "form-feedback error";
       }
 
       if (submitButton) {
         submitButton.textContent = "Tentar novamente";
       }
-
     } finally {
       if (submitButton) {
         submitButton.disabled = false;
-
-        if (submitButton.textContent === "Enviando...") {
-          submitButton.textContent = "Solicitar reserva";
-        }
       }
     }
   });
 }
 
-// ============================================
-// INICIALIZAÇÃO
-// ============================================
+const yearElement = document.getElementById("current-year");
 
-document.addEventListener("DOMContentLoaded", function () {
-  loadExcursions();
-});
-```
+if (yearElement) {
+  yearElement.textContent = new Date().getFullYear();
+}
+
+loadExcursions();
