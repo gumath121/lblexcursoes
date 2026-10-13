@@ -2,14 +2,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --black: #090909;
-  --surface: #111111;
-  --surface-light: #191919;
+  --black: #101114;
+  --surface: #ffffff;
+  --surface-light: #f4f5f7;
   --red: #ed1c24;
-  --silver: #c4c4c4;
-  --white: #f7f7f7;
-  --muted: #999999;
-  --border: rgba(255,255,255,.12);
+  --silver: #aeb3bc;
+  --white: #ffffff;
+  --muted: #626875;
+  --border: #e4e6eb;
+  --text: #20232a;
 }
 
 * {
@@ -20,14 +21,14 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 100px;
+  scroll-padding-top: 90px;
 }
 
 body {
-  background: var(--black);
-  color: var(--white);
+  background: #ffffff;
+  color: var(--text);
   font-family: 'Inter', sans-serif;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 a {
@@ -43,18 +44,25 @@ button, a {
   -webkit-tap-highlight-color: transparent;
 }
 
+img {
+  max-width: 100%;
+}
+
+/* CABEÇALHO */
+
 .topbar {
-  height: 86px;
-  padding: 0 7%;
+  min-height: 82px;
+  padding: 12px 7%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 30px;
-  background: #090909;
-  border-bottom: 1px solid var(--border);
+  gap: 25px;
+  background: #101114;
+  border-bottom: 3px solid var(--red);
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, .12);
 }
 
 .brand {
@@ -67,7 +75,7 @@ button, a {
 .brand-mark {
   color: var(--red);
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 39px;
+  font-size: 42px;
   font-weight: 900;
   letter-spacing: -2px;
   line-height: 1;
@@ -76,57 +84,63 @@ button, a {
 .brand-text {
   display: flex;
   flex-direction: column;
-  line-height: 1.25;
+  line-height: 1.3;
 }
 
 .brand-text strong {
+  color: #ffffff;
   font-size: 12px;
-  letter-spacing: 2px;
+  letter-spacing: 1.7px;
 }
 
 .brand-text small {
-  color: var(--silver);
+  color: #c3c6cc;
   font-size: 8px;
-  letter-spacing: 1.7px;
+  letter-spacing: 1.4px;
   margin-top: 4px;
 }
 
 .topbar nav {
   display: flex;
-  gap: 30px;
+  gap: 28px;
   align-items: center;
 }
 
 .topbar nav a {
-  color: #c2c2c2;
+  color: #e3e5e9;
   font-size: 12px;
+  font-weight: 600;
   transition: color .2s;
 }
 
-.topbar nav a:hover,
-.footer > a:last-child:hover {
-  color: var(--red);
+.topbar nav a:hover {
+  color: #ff444b;
 }
+
+/* BOTÕES */
 
 .button {
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  gap: 16px;
-  padding: 15px 23px;
+  gap: 10px;
+  padding: 14px 23px;
   background: var(--red);
-  color: white;
+  color: #ffffff;
   border: 1px solid var(--red);
+  border-radius: 5px;
   font-size: 12px;
   font-weight: 800;
-  letter-spacing: .3px;
+  letter-spacing: .2px;
   cursor: pointer;
-  transition: background .2s, transform .2s;
+  transition: background .2s, transform .2s, box-shadow .2s;
 }
 
 .button:hover {
-  background: #c90e16;
+  background: #c91019;
+  border-color: #c91019;
   transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(237, 28, 36, .2);
 }
 
 .button-small {
@@ -136,12 +150,17 @@ button, a {
 
 .button-outline {
   background: transparent;
-  border-color: rgba(255,255,255,.35);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, .55);
 }
 
 .button-outline:hover {
-  background: rgba(255,255,255,.08);
+  background: #ffffff;
+  color: #111111;
+  border-color: #ffffff;
 }
+
+/* BANNER PRINCIPAL */
 
 .hero {
   min-height: 620px;
@@ -149,29 +168,45 @@ button, a {
   display: flex;
   align-items: center;
   overflow: hidden;
-  padding: 80px 10%;
+  padding: 85px 9%;
+  color: #ffffff;
   background:
-    radial-gradient(ellipse at 80% 45%, rgba(237,28,36,.16), transparent 36%),
-    linear-gradient(110deg, #090909 10%, #111111 65%, #1a0b0c 100%);
+    radial-gradient(ellipse at 85% 40%, rgba(237, 28, 36, .32), transparent 38%),
+    linear-gradient(115deg, #0a0b0e 0%, #17191e 60%, #360d12 100%);
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  right: -100px;
+  top: 15%;
+  border: 1px solid rgba(255, 255, 255, .09);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 35px rgba(255, 255, 255, .025),
+    0 0 0 70px rgba(255, 255, 255, .02);
+  pointer-events: none;
 }
 
 .hero::after {
   content: "LBL";
   position: absolute;
-  right: -1%;
-  bottom: -20%;
+  right: 1%;
+  bottom: -19%;
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: clamp(250px, 40vw, 620px);
+  font-size: clamp(260px, 40vw, 600px);
   line-height: 1;
   font-weight: 900;
-  color: rgba(255,255,255,.025);
+  color: rgba(255, 255, 255, .035);
   pointer-events: none;
 }
 
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(9,9,9,.1), transparent);
+  background: linear-gradient(90deg, rgba(8, 9, 12, .2), transparent);
   pointer-events: none;
 }
 
@@ -185,18 +220,19 @@ button, a {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: var(--silver);
+  color: #e0e2e6;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 2px;
 }
 
 .red-dot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   display: inline-block;
   background: var(--red);
-  box-shadow: 0 0 12px rgba(237,28,36,.6);
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(237, 28, 36, .65);
 }
 
 .hero h1,
@@ -205,14 +241,15 @@ button, a {
 .contact-section h2 {
   font-family: 'Barlow Condensed', sans-serif;
   text-transform: uppercase;
-  font-weight: 800;
-  line-height: .99;
-  letter-spacing: -.7px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -.5px;
 }
 
 .hero h1 {
   font-size: clamp(58px, 7.5vw, 100px);
-  margin: 28px 0 22px;
+  margin: 28px 0 24px;
+  color: #ffffff;
 }
 
 .hero h1 span,
@@ -222,8 +259,8 @@ button, a {
 }
 
 .hero-content > p {
-  max-width: 475px;
-  color: #b2b2b2;
+  max-width: 490px;
+  color: #d1d3d8;
   font-size: 14px;
   line-height: 1.9;
 }
@@ -237,10 +274,11 @@ button, a {
 
 .hero-features {
   display: flex;
+  flex-wrap: wrap;
   gap: 36px;
-  margin-top: 58px;
-  padding-top: 25px;
-  border-top: 1px solid var(--border);
+  margin-top: 55px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, .18);
 }
 
 .hero-features div {
@@ -250,20 +288,20 @@ button, a {
 }
 
 .hero-features strong {
-  color: var(--red);
+  color: #ffffff;
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 22px;
+  font-size: 23px;
 }
 
 .hero-features span {
-  color: #b5b5b5;
+  color: #c5c8cf;
   font-size: 10px;
 }
 
 .hero-label {
   position: absolute;
-  right: 9%;
-  bottom: 12%;
+  right: 8%;
+  bottom: 10%;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -273,24 +311,26 @@ button, a {
 .hero-label span {
   font-family: 'Barlow Condensed', sans-serif;
   font-weight: 900;
-  font-size: 90px;
+  font-size: 80px;
   line-height: 1;
   color: transparent;
-  -webkit-text-stroke: 1px rgba(255,255,255,.5);
+  -webkit-text-stroke: 1px rgba(255, 255, 255, .45);
 }
 
 .hero-label small {
-  color: var(--silver);
+  color: #d0d2d8;
   font-size: 9px;
   letter-spacing: 3px;
 }
 
+/* SEÇÕES */
+
 .section {
-  padding: 100px 9%;
+  padding: 90px 8%;
 }
 
 .excursions-section {
-  background: #0d0d0d;
+  background: #f4f5f7;
 }
 
 .section-heading {
@@ -305,59 +345,70 @@ button, a {
 .about-content h2,
 .contact-section h2 {
   font-size: clamp(42px, 5vw, 65px);
-  margin-top: 17px;
+  margin-top: 15px;
 }
 
-.section-heading p,
-.contact-section p {
-  color: var(--muted);
+.section-heading h2 {
+  color: #17191e;
+}
+
+.section-heading p {
+  color: #626875;
   font-size: 13px;
   margin-top: 13px;
 }
 
 .heading-number {
-  color: #777;
+  color: #737987;
   font-size: 10px;
   letter-spacing: 2px;
   white-space: nowrap;
   padding-bottom: 8px;
 }
 
+/* CARDS DAS EXCURSÕES */
+
 .excursions-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
+  gap: 25px;
 }
 
 .excursion-card {
   min-width: 0;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  transition: transform .25s, border-color .25s;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  color: #20232a;
+  border: 1px solid #e2e4e9;
+  border-radius: 9px;
   overflow: hidden;
+  box-shadow: 0 5px 22px rgba(25, 30, 40, .06);
+  transition: transform .25s, box-shadow .25s, border-color .25s;
 }
 
 .excursion-card:hover {
   transform: translateY(-5px);
-  border-color: rgba(237,28,36,.7);
+  border-color: rgba(237, 28, 36, .5);
+  box-shadow: 0 15px 35px rgba(25, 30, 40, .12);
 }
 
 .excursion-image {
   width: 100%;
-  height: 220px;
+  height: 230px;
   display: block;
   object-fit: cover;
-  background: #222;
+  background: #e5e7eb;
 }
 
 .excursion-image-placeholder {
-  height: 220px;
+  height: 230px;
   display: flex;
   align-items: center;
   justify-content: center;
   background:
-    radial-gradient(circle at center, rgba(237,28,36,.18), transparent 55%),
-    #181818;
+    radial-gradient(circle at center, rgba(237, 28, 36, .12), transparent 60%),
+    #e9ebef;
   color: var(--red);
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 58px;
@@ -365,74 +416,93 @@ button, a {
 }
 
 .excursion-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   padding: 24px;
 }
 
 .excursion-destination {
-  color: var(--red);
+  color: #d71920;
   font-size: 10px;
   font-weight: 800;
-  letter-spacing: 1.5px;
+  letter-spacing: 1.4px;
   text-transform: uppercase;
 }
 
 .excursion-info h3 {
+  color: #17191e;
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 30px;
-  line-height: 1.1;
+  line-height: 1.15;
   text-transform: uppercase;
-  margin: 8px 0 14px;
+  margin: 8px 0 12px;
+  overflow-wrap: anywhere;
+}
+
+.excursion-description {
+  color: #626875;
+  font-size: 12px;
+  line-height: 1.8;
 }
 
 .excursion-meta {
   display: grid;
-  gap: 8px;
+  gap: 9px;
   margin: 18px 0;
   padding-top: 16px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid #e8e9ed;
 }
 
 .excursion-meta span {
-  color: #bdbdbd;
+  color: #535966;
   font-size: 11px;
+  overflow-wrap: anywhere;
 }
 
-.excursion-description {
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.8;
+.excursion-meta strong {
+  color: #242832;
 }
 
 .excursion-bottom {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
-  margin-top: 22px;
+  margin-top: auto;
+  padding-top: 18px;
+  border-top: 1px solid #e8e9ed;
 }
 
 .excursion-price small {
   display: block;
-  color: var(--muted);
+  color: #737987;
   font-size: 10px;
 }
 
 .excursion-price strong {
+  display: block;
+  color: #17191e;
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 28px;
-  color: var(--white);
+  font-size: 30px;
+  line-height: 1.2;
 }
 
 .excursion-bottom .button {
-  padding: 11px 13px;
+  padding: 12px 15px;
   font-size: 10px;
 }
 
+/* MENSAGENS */
+
 .status-message {
-  padding: 25px;
-  color: var(--muted);
+  padding: 22px 25px;
+  color: #505664;
+  background: #ffffff;
   font-size: 13px;
-  border: 1px dashed var(--border);
+  border: 1px dashed #cfd2d9;
+  border-radius: 7px;
   margin-bottom: 25px;
 }
 
@@ -441,28 +511,32 @@ button, a {
 }
 
 .status-message.error {
-  color: #ff7777;
+  color: #b4232b;
+  background: #fff1f1;
+  border-color: #f2b7ba;
 }
 
+/* SOBRE */
+
 .about-section {
-  padding: 100px 9%;
+  padding: 95px 8%;
   display: grid;
   grid-template-columns: .8fr 1.2fr;
   align-items: center;
   gap: 60px;
-  background: #141414;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  background: #ffffff;
+  border-top: 1px solid #e6e7eb;
+  border-bottom: 1px solid #e6e7eb;
 }
 
 .about-number {
   color: transparent;
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: clamp(120px, 22vw, 290px);
+  font-size: clamp(120px, 22vw, 280px);
   line-height: .9;
   font-weight: 900;
   letter-spacing: -12px;
-  -webkit-text-stroke: 2px rgba(255,255,255,.18);
+  -webkit-text-stroke: 2px #cdd0d6;
 }
 
 .about-number span {
@@ -471,44 +545,59 @@ button, a {
 }
 
 .about-content h2 {
+  color: #17191e;
   margin-bottom: 22px;
 }
 
 .about-content p {
-  max-width: 540px;
-  color: #aaa;
+  max-width: 550px;
+  color: #626875;
   font-size: 13px;
   line-height: 2;
 }
 
 .text-link {
   display: inline-block;
-  color: var(--white);
+  color: #242832;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
   margin-top: 25px;
   padding-bottom: 7px;
-  border-bottom: 1px solid var(--red);
+  border-bottom: 2px solid var(--red);
+  transition: color .2s;
 }
 
+.text-link:hover {
+  color: var(--red);
+}
+
+/* CONTATO */
+
 .contact-section {
-  padding: 80px 9%;
+  padding: 80px 8%;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 30px;
   background:
-    linear-gradient(110deg, rgba(237,28,36,.12), transparent 60%),
-    #0a0a0a;
+    radial-gradient(ellipse at 85% 50%, rgba(237, 28, 36, .2), transparent 45%),
+    #111216;
+  color: #ffffff;
 }
 
 .contact-section h2 {
+  color: #ffffff;
   font-size: clamp(38px, 4.5vw, 58px);
 }
 
 .contact-section p {
   max-width: 500px;
+  color: #d0d2d8;
+  font-size: 13px;
+  margin-top: 13px;
 }
+
+/* RODAPÉ */
 
 .footer {
   min-height: 100px;
@@ -517,29 +606,37 @@ button, a {
   justify-content: space-between;
   gap: 25px;
   padding: 25px 7%;
-  background: #070707;
-  border-top: 1px solid var(--border);
+  background: #090a0c;
+  border-top: 3px solid var(--red);
 }
 
 .footer p,
 .footer > a:last-child {
-  color: var(--muted);
+  color: #c1c4cb;
   font-size: 10px;
 }
+
+.footer > a:last-child:hover {
+  color: #ff454c;
+}
+
+/* FORMULÁRIO DE RESERVA */
 
 .reservation-dialog {
   width: min(520px, calc(100% - 28px));
   max-height: 90vh;
   overflow-y: auto;
   margin: auto;
-  padding: 34px;
-  color: var(--white);
-  background: #141414;
-  border: 1px solid #444;
+  padding: 32px;
+  color: #242832;
+  background: #ffffff;
+  border: 1px solid #e0e2e7;
+  border-radius: 10px;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, .25);
 }
 
 .reservation-dialog::backdrop {
-  background: rgba(0,0,0,.82);
+  background: rgba(8, 10, 15, .72);
   backdrop-filter: blur(5px);
 }
 
@@ -551,15 +648,16 @@ button, a {
 
 .dialog-close {
   align-self: flex-end;
-  margin-top: -15px;
+  margin-top: -12px;
   background: transparent;
   border: none;
-  color: white;
+  color: #343842;
   font-size: 30px;
   cursor: pointer;
 }
 
 .reservation-dialog h2 {
+  color: #17191e;
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 36px;
   text-transform: uppercase;
@@ -568,15 +666,15 @@ button, a {
 }
 
 .reservation-details {
-  color: var(--silver);
+  color: #626875;
   font-size: 12px;
   margin: 3px 0 15px;
 }
 
 .reservation-dialog label {
-  color: #ddd;
+  color: #30343d;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
   margin-top: 6px;
 }
 
@@ -584,20 +682,25 @@ button, a {
 .reservation-dialog select {
   width: 100%;
   padding: 13px;
-  background: #090909;
-  color: white;
-  border: 1px solid #444;
+  background: #ffffff;
+  color: #20232a;
+  border: 1px solid #cfd2d9;
   outline: none;
-  border-radius: 0;
+  border-radius: 5px;
+}
+
+.reservation-dialog input::placeholder {
+  color: #8b909b;
 }
 
 .reservation-dialog input:focus,
 .reservation-dialog select:focus {
   border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(237, 28, 36, .1);
 }
 
 .form-note {
-  color: #aaa;
+  color: #626875;
   font-size: 10px;
   line-height: 1.7;
   margin: 8px 0;
@@ -616,26 +719,35 @@ button, a {
 
 .form-feedback {
   font-size: 12px;
-  color: #ddd;
+  color: #424752;
   overflow-wrap: anywhere;
+  margin-top: 8px;
 }
 
 .form-feedback.success {
-  color: #8de5a4;
+  color: #16763a;
+  background: #eaf8ef;
+  padding: 12px;
+  border-radius: 5px;
 }
 
 .form-feedback.error {
-  color: #ff7777;
+  color: #b4232b;
+  background: #fff0f0;
+  padding: 12px;
+  border-radius: 5px;
 }
+
+/* TABLETS */
 
 @media (max-width: 1000px) {
   .topbar {
-    padding: 0 4%;
+    padding: 12px 4%;
     gap: 15px;
   }
 
   .topbar nav {
-    gap: 16px;
+    gap: 15px;
   }
 
   .topbar nav a {
@@ -644,6 +756,7 @@ button, a {
 
   .hero {
     padding-left: 7%;
+    padding-right: 7%;
   }
 
   .section,
@@ -656,7 +769,13 @@ button, a {
   .excursions-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .about-section {
+    gap: 35px;
+  }
 }
+
+/* CELULARES */
 
 @media (max-width: 700px) {
   html {
@@ -664,8 +783,12 @@ button, a {
   }
 
   .topbar {
-    height: 72px;
-    padding: 0 5%;
+    min-height: 70px;
+    padding: 10px 5%;
+  }
+
+  .brand {
+    gap: 8px;
   }
 
   .brand-mark {
@@ -673,11 +796,13 @@ button, a {
   }
 
   .brand-text strong {
-    font-size: 10px;
+    font-size: 9px;
+    letter-spacing: 1px;
   }
 
   .brand-text small {
     font-size: 7px;
+    letter-spacing: .8px;
   }
 
   .topbar nav {
@@ -685,28 +810,52 @@ button, a {
   }
 
   .topbar > .button {
-    padding: 10px 12px;
-    font-size: 10px;
+    padding: 10px 11px;
+    font-size: 9px;
+    gap: 5px;
   }
 
   .hero {
-    min-height: 610px;
-    padding: 75px 7% 45px;
+    min-height: 590px;
+    padding: 70px 6% 40px;
     align-items: flex-start;
   }
 
+  .hero::before {
+    width: 260px;
+    height: 260px;
+    right: -120px;
+    top: 15%;
+  }
+
   .hero h1 {
-    font-size: clamp(55px, 14vw, 78px);
-    margin-top: 24px;
+    font-size: clamp(53px, 13.5vw, 76px);
+    margin-top: 23px;
   }
 
   .hero-content > p {
     font-size: 13px;
+    line-height: 1.8;
+  }
+
+  .hero-actions {
+    gap: 10px;
+    margin-top: 25px;
+  }
+
+  .hero-actions .button {
+    padding: 13px 15px;
+    font-size: 11px;
   }
 
   .hero-features {
-    gap: 18px;
-    margin-top: 43px;
+    gap: 17px;
+    margin-top: 40px;
+    padding-top: 20px;
+  }
+
+  .hero-features strong {
+    font-size: 20px;
   }
 
   .hero-features span {
@@ -715,34 +864,49 @@ button, a {
   }
 
   .hero-label {
-    right: 7%;
-    bottom: 4%;
+    right: 6%;
+    bottom: 3%;
   }
 
   .hero-label span {
-    font-size: 52px;
+    font-size: 43px;
   }
 
   .hero-label small {
     font-size: 7px;
+    letter-spacing: 2px;
   }
 
   .section {
-    padding: 70px 6%;
+    padding: 65px 5%;
   }
 
   .section-heading {
     display: block;
+    margin-bottom: 28px;
+  }
+
+  .section-heading h2,
+  .about-content h2 {
+    font-size: 45px;
+  }
+
+  .section-heading p {
+    font-size: 12px;
   }
 
   .heading-number {
     display: inline-block;
-    margin-top: 22px;
+    margin-top: 18px;
   }
 
   .excursions-grid {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 22px;
+  }
+
+  .excursion-card {
+    border-radius: 8px;
   }
 
   .excursion-image,
@@ -750,33 +914,69 @@ button, a {
     height: 220px;
   }
 
+  .excursion-info {
+    padding: 21px;
+  }
+
+  .excursion-info h3 {
+    font-size: 28px;
+  }
+
+  .excursion-bottom {
+    align-items: center;
+  }
+
   .about-section {
-    padding: 65px 7%;
+    padding: 60px 6%;
     grid-template-columns: 1fr;
-    gap: 25px;
-  }
-
-  .about-number {
-    font-size: 120px;
-    letter-spacing: -6px;
-  }
-
-  .contact-section {
-    padding: 65px 7%;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .footer {
-    padding: 30px 6%;
-    flex-direction: column;
-    align-items: flex-start;
     gap: 20px;
   }
 
-  .reservation-dialog {
-    padding: 24px;
+  .about-number {
+    font-size: 115px;
+    letter-spacing: -6px;
   }
+
+  .about-content p {
+    font-size: 12px;
+  }
+
+  .contact-section {
+    padding: 60px 6%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 22px;
+  }
+
+  .contact-section h2 {
+    font-size: 43px;
+  }
+
+  .footer {
+    padding: 28px 6%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .reservation-dialog {
+    padding: 23px;
+    border-radius: 8px;
+  }
+
+  .reservation-dialog h2 {
+    font-size: 32px;
+  }
+}
+
+/* ACESSIBILIDADE */
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid rgba(237, 28, 36, .55);
+  outline-offset: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {
