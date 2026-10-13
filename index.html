@@ -1,169 +1,528 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>LBL Excursões | Viaje com conforto</title>
+  <title>LBL Excursões | Viaje com conforto e segurança</title>
 
-  <meta name="description" content="Confira as próximas excursões da Viação LBL. Consulte destinos, datas, valores e solicite sua reserva online.">
+  <meta
+    name="description"
+    content="Confira as próximas excursões da LBL, conheça nossos destinos e reserve seus lugares com praticidade."
+  >
 
-  <meta name="theme-color" content="#090909">
+  <meta name="theme-color" content="#080808">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
 
   <link rel="stylesheet" href="style.css">
 
+  <!-- Biblioteca necessária para a integração com o Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Mantém o funcionamento atual das excursões e reservas -->
   <script src="app.js" defer></script>
 </head>
 
 <body>
-  <header class="topbar">
-    <a href="index.html" class="brand">
-      <span class="brand-mark">LBL</span>
-      <span class="brand-text">
-        <strong>EXCURSÕES</strong>
-        <small>VIAJE COM CONFORTO</small>
-      </span>
-    </a>
 
-    <nav>
-      <a href="#inicio">Início</a>
-      <a href="#excursões">Excursões</a>
-      <a href="#sobre">Sobre nós</a>
-      <a href="#contato">Contato</a>
-    </nav>
+  <!-- CABEÇALHO -->
+  <header class="site-header">
+    <div class="container header-inner">
 
-    <a href="#excursões" class="button button-small">Ver viagens</a>
-  </header>
+      <a class="brand" href="#inicio" aria-label="LBL Excursões - Página inicial">
+        <img
+          src="logo.png"
+          alt="Logo Viação LBL"
+          class="brand-logo"
+        >
+      </a>
 
-  <main>
-    <section class="hero" id="inicio">
-      <div class="hero-overlay"></div>
+      <nav class="main-nav" id="main-nav" aria-label="Menu principal">
+        <a href="#inicio">Início</a>
+        <a href="#excursions">Excursões</a>
+        <a href="#sobre">Sobre nós</a>
+        <a href="#contato">Contato</a>
+      </nav>
 
-      <div class="hero-content">
-        <span class="eyebrow">
-          <span class="red-dot"></span>
-          SUA PRÓXIMA VIAGEM COMEÇA AQUI
-        </span>
+      <a href="#excursions" class="button button-header">
+        VER EXCURSÕES
+        <span aria-hidden="true">↗</span>
+      </a>
 
-        <h1>Seu destino.<br>Nosso <span>compromisso.</span></h1>
-
-        <p>
-          Descubra novos lugares, viva experiências incríveis
-          e viaje com o conforto e a confiança da LBL.
-        </p>
-
-        <div class="hero-actions">
-          <a href="#excursões" class="button">Explorar excursões <span>↗</span></a>
-          <a href="#sobre" class="button button-outline">Conheça a LBL</a>
-        </div>
-
-        <div class="hero-features">
-          <div><strong>01</strong><span>Conforto na viagem</span></div>
-          <div><strong>02</strong><span>Destinos especiais</span></div>
-          <div><strong>03</strong><span>Atendimento próximo</span></div>
-        </div>
-      </div>
-
-      <div class="hero-label">
-        <span>LBL</span>
-        <small>VIAÇÃO & EXCURSÕES</small>
-      </div>
-    </section>
-
-    <section class="section excursions-section" id="excursões">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow"><span class="red-dot"></span> PROGRAME-SE</span>
-          <h2>Próximas <span>excursões</span></h2>
-          <p>Escolha seu próximo destino e solicite sua reserva.</p>
-        </div>
-        <span class="heading-number">01 / DESTINOS</span>
-      </div>
-
-      <div id="excursions-status" class="status-message">
-        Carregando excursões...
-      </div>
-
-      <div id="excursions-list" class="excursions-grid"></div>
-    </section>
-
-    <section class="about-section" id="sobre">
-      <div class="about-number">LBL<span>.</span></div>
-
-      <div class="about-content">
-        <span class="eyebrow"><span class="red-dot"></span> MAIS QUE UMA VIAGEM</span>
-        <h2>O prazer de viajar<br>começa no <span>caminho.</span></h2>
-        <p>
-          A LBL conecta pessoas a destinos e experiências.
-          Trabalhamos para oferecer viagens organizadas,
-          atendimento atencioso e mais tranquilidade em cada trajeto.
-        </p>
-        <a href="#excursões" class="text-link">Encontre sua próxima viagem ↗</a>
-      </div>
-    </section>
-
-    <section class="contact-section" id="contato">
-      <div>
-        <span class="eyebrow"><span class="red-dot"></span> FALE COM A NOSSA EQUIPE</span>
-        <h2>Vamos planejar<br>sua próxima viagem?</h2>
-        <p>Consulte as excursões disponíveis e envie sua solicitação de reserva.</p>
-      </div>
-      <a href="#excursões" class="button">Consultar excursões ↗</a>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <a href="index.html" class="brand">
-      <span class="brand-mark">LBL</span>
-      <span class="brand-text">
-        <strong>EXCURSÕES</strong>
-        <small>VIAJE COM CONFORTO</small>
-      </span>
-    </a>
-
-    <p>© <span id="current-year"></span> Viação LBL. Todos os direitos reservados.</p>
-    <a href="admin/">Área administrativa ↗</a>
-  </footer>
-
-  <dialog id="reservation-dialog" class="reservation-dialog">
-    <form id="reservation-form">
-      <button type="button" class="dialog-close" id="close-dialog" aria-label="Fechar">×</button>
-
-      <span class="eyebrow"><span class="red-dot"></span> SOLICITAÇÃO DE RESERVA</span>
-      <h2 id="reservation-title">Reserve sua viagem</h2>
-      <p id="reservation-details" class="reservation-details"></p>
-
-      <input type="hidden" id="reservation-excursion-id">
-
-      <label for="passenger-name">Nome completo</label>
-      <input id="passenger-name" type="text" maxlength="120" autocomplete="name" required placeholder="Digite seu nome">
-
-      <label for="passenger-phone">WhatsApp com DDD</label>
-      <input id="passenger-phone" type="tel" maxlength="30" autocomplete="tel" required placeholder="Ex.: (15) 99999-9999">
-
-      <label for="passenger-seats">Quantidade de passageiros</label>
-      <select id="passenger-seats" required>
-        <option value="1">1 passageiro</option>
-        <option value="2">2 passageiros</option>
-        <option value="3">3 passageiros</option>
-        <option value="4">4 passageiros</option>
-        <option value="5">5 passageiros</option>
-      </select>
-
-      <p class="form-note">
-        Sua solicitação ficará pendente até a confirmação da equipe LBL.
-        O envio não garante a reserva nem confirma o pagamento.
-      </p>
-
-      <button type="submit" class="button button-submit" id="reservation-submit">
-        Enviar solicitação ↗
+      <button
+        class="menu-toggle"
+        id="menu-toggle"
+        type="button"
+        aria-label="Abrir menu"
+        aria-expanded="false"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
       </button>
 
-      <p id="reservation-feedback" class="form-feedback" role="status"></p>
-    </form>
+    </div>
+  </header>
+
+
+  <main>
+
+    <!-- BANNER PRINCIPAL -->
+    <section class="hero" id="inicio">
+      <div class="hero-shade"></div>
+
+      <div class="container hero-inner">
+        <div class="hero-content">
+
+          <div class="hero-label">
+            <span class="label-line"></span>
+            VIAJE COM A LBL
+          </div>
+
+          <h1>
+            SEU PRÓXIMO DESTINO
+            <span>COMEÇA AQUI.</span>
+          </h1>
+
+          <p class="hero-description">
+            Descubra novos lugares, viva experiências inesquecíveis
+            e viaje com conforto, segurança e tranquilidade.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#excursions" class="button button-primary">
+              ENCONTRE SUA PRÓXIMA VIAGEM
+              <span aria-hidden="true">→</span>
+            </a>
+
+            <a href="#sobre" class="button button-outline">
+              CONHEÇA A LBL
+            </a>
+          </div>
+
+          <div class="hero-trust">
+            <span class="trust-symbol">✓</span>
+            <span>Conforto, organização e atenção em cada viagem</span>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="hero-bottom-line"></div>
+    </section>
+
+
+    <!-- DIFERENCIAIS -->
+    <section class="features-strip" aria-label="Nossos diferenciais">
+      <div class="container features-grid">
+
+        <article class="feature-item">
+          <span class="feature-icon" aria-hidden="true">✦</span>
+          <div>
+            <strong>VIAGENS ORGANIZADAS</strong>
+            <p>Planejamento do início ao fim</p>
+          </div>
+        </article>
+
+        <article class="feature-item">
+          <span class="feature-icon" aria-hidden="true">◈</span>
+          <div>
+            <strong>CONFORTO NA ESTRADA</strong>
+            <p>Mais tranquilidade no percurso</p>
+          </div>
+        </article>
+
+        <article class="feature-item">
+          <span class="feature-icon" aria-hidden="true">◎</span>
+          <div>
+            <strong>DESTINOS ESPECIAIS</strong>
+            <p>Experiências para recordar</p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+
+    <!-- EXCURSÕES DISPONÍVEIS -->
+    <section class="excursions-section section" id="excursions">
+      <div class="container">
+
+        <div class="section-heading">
+          <div class="section-heading-copy">
+            <span class="eyebrow">ESCOLHA SEU PRÓXIMO ROTEIRO</span>
+            <h2>
+              PRÓXIMAS <span>EXCURSÕES</span>
+            </h2>
+            <p>
+              Confira os destinos disponíveis e garanta sua reserva
+              de forma simples e prática.
+            </p>
+          </div>
+
+          <div class="section-heading-mark" aria-hidden="true">
+            <span>LBL</span>
+            <small>EXCURSÕES</small>
+          </div>
+        </div>
+
+        <div
+          class="excursions-status"
+          id="excursions-status"
+          role="status"
+          aria-live="polite"
+        >
+          Carregando excursões...
+        </div>
+
+        <div class="excursions-grid" id="excursions-list">
+          <!-- Os cards das excursões são carregados pelo app.js -->
+        </div>
+
+        <div class="excursions-note">
+          <span class="note-icon" aria-hidden="true">ⓘ</span>
+          <p>
+            As vagas são limitadas. Consulte as informações de cada
+            excursão antes de confirmar sua reserva.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- SOBRE A EMPRESA -->
+    <section class="about-section section" id="sobre">
+      <div class="container about-grid">
+
+        <div class="about-visual">
+          <div class="about-image-frame">
+            <img
+              src="bannerviagem.jpg"
+              alt="Imagem de viagem da LBL Excursões"
+              loading="lazy"
+            >
+            <div class="about-image-overlay"></div>
+
+            <div class="about-stamp">
+              <span>LBL</span>
+              <small>VIAJE COM A GENTE</small>
+            </div>
+          </div>
+
+          <div class="about-red-accent"></div>
+        </div>
+
+        <div class="about-content">
+          <span class="eyebrow">MUITO ALÉM DO DESTINO</span>
+
+          <h2>
+            A SUA VIAGEM
+            <span>É A NOSSA PRIORIDADE.</span>
+          </h2>
+
+          <p>
+            A LBL trabalha para proporcionar experiências de viagem
+            organizadas, confortáveis e tranquilas. Nosso objetivo
+            é fazer com que cada passageiro aproveite o caminho e
+            curta cada momento do destino.
+          </p>
+
+          <p>
+            Seja para conhecer um lugar novo, aproveitar um passeio
+            ou viajar com a família e os amigos, queremos fazer parte
+            da sua próxima experiência.
+          </p>
+
+          <div class="about-points">
+            <div class="about-point">
+              <span>✓</span>
+              <p>Atendimento atencioso</p>
+            </div>
+
+            <div class="about-point">
+              <span>✓</span>
+              <p>Organização dos roteiros</p>
+            </div>
+
+            <div class="about-point">
+              <span>✓</span>
+              <p>Compromisso com a experiência do passageiro</p>
+            </div>
+          </div>
+
+          <a href="#excursions" class="button button-primary">
+            CONHEÇA AS EXCURSÕES
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- CHAMADA PARA RESERVAS -->
+    <section class="booking-cta">
+      <div class="container booking-cta-inner">
+        <div>
+          <span class="eyebrow">A PRÓXIMA HISTÓRIA PODE SER SUA</span>
+          <h2>VAMOS VIAJAR?</h2>
+          <p>
+            Escolha seu destino, confira as informações e faça sua reserva.
+          </p>
+        </div>
+
+        <a href="#excursions" class="button button-light">
+          VER DESTINOS
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+
+
+    <!-- CONTATO -->
+    <section class="contact-section section" id="contato">
+      <div class="container contact-grid">
+
+        <div class="contact-copy">
+          <span class="eyebrow">FALE COM A GENTE</span>
+          <h2>VAMOS PLANEJAR <span>SUA VIAGEM?</span></h2>
+          <p>
+            Consulte as excursões disponíveis e escolha o roteiro
+            que combina com você.
+          </p>
+        </div>
+
+        <div class="contact-card">
+          <div class="contact-card-icon" aria-hidden="true">✉</div>
+          <div>
+            <h3>RESERVAS E INFORMAÇÕES</h3>
+            <p>
+              Consulte os detalhes de cada excursão e envie sua
+              solicitação pelo formulário de reserva.
+            </p>
+            <a href="#excursions" class="text-link">
+              VER EXCURSÕES <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- JANELA DE RESERVA -->
+  <dialog class="reservation-dialog" id="reservation-dialog">
+    <div class="dialog-inner">
+
+      <div class="dialog-header">
+        <div>
+          <span class="eyebrow">LBL EXCURSÕES</span>
+          <h2 id="reservation-title">FAZER RESERVA</h2>
+        </div>
+
+        <button
+          class="dialog-close"
+          id="close-dialog"
+          type="button"
+          aria-label="Fechar janela"
+        >
+          ×
+        </button>
+      </div>
+
+      <p class="dialog-details" id="reservation-details">
+        Preencha os dados abaixo para solicitar sua reserva.
+      </p>
+
+      <form class="reservation-form" id="reservation-form">
+
+        <input
+          type="hidden"
+          id="reservation-excursion-id"
+          name="excursion_id"
+        >
+
+        <div class="form-field">
+          <label for="passenger-name">Nome completo</label>
+          <input
+            type="text"
+            id="passenger-name"
+            name="passenger_name"
+            placeholder="Digite seu nome completo"
+            autocomplete="name"
+            required
+            maxlength="120"
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="passenger-phone">Telefone / WhatsApp</label>
+          <input
+            type="tel"
+            id="passenger-phone"
+            name="passenger_phone"
+            placeholder="(15) 99999-9999"
+            autocomplete="tel"
+            required
+            maxlength="30"
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="passenger-seats">Quantidade de lugares</label>
+          <select
+            id="passenger-seats"
+            name="seats"
+            required
+          >
+            <option value="1">1 lugar</option>
+            <option value="2">2 lugares</option>
+            <option value="3">3 lugares</option>
+            <option value="4">4 lugares</option>
+            <option value="5">5 lugares</option>
+            <option value="6">6 lugares</option>
+            <option value="7">7 lugares</option>
+            <option value="8">8 lugares</option>
+            <option value="9">9 lugares</option>
+            <option value="10">10 lugares</option>
+          </select>
+        </div>
+
+        <p
+          class="reservation-feedback"
+          id="reservation-feedback"
+          role="status"
+          aria-live="polite"
+        ></p>
+
+        <button
+          class="button button-primary button-submit"
+          id="reservation-submit"
+          type="submit"
+        >
+          ENVIAR SOLICITAÇÃO
+          <span aria-hidden="true">→</span>
+        </button>
+
+        <p class="form-privacy">
+          O envio representa uma solicitação de reserva. Aguarde
+          a confirmação da equipe da LBL.
+        </p>
+
+      </form>
+    </div>
   </dialog>
+
+
+  <!-- RODAPÉ -->
+  <footer class="site-footer">
+    <div class="container footer-main">
+
+      <div class="footer-brand">
+        <a href="#inicio" aria-label="Voltar ao início">
+          <img
+            src="logo.png"
+            alt="Viação LBL Excursões"
+            class="footer-logo"
+            loading="lazy"
+          >
+        </a>
+
+        <p>
+          Seu próximo destino começa aqui. Viaje com conforto,
+          organização e tranquilidade.
+        </p>
+      </div>
+
+      <div class="footer-links">
+        <h3>NAVEGAÇÃO</h3>
+        <a href="#inicio">Início</a>
+        <a href="#excursions">Excursões</a>
+        <a href="#sobre">Sobre nós</a>
+        <a href="#contato">Contato</a>
+      </div>
+
+      <div class="footer-links">
+        <h3>ENCONTRE SUA VIAGEM</h3>
+        <p>Consulte os roteiros disponíveis e faça sua solicitação de reserva.</p>
+        <a href="#excursions" class="footer-cta">
+          VER EXCURSÕES <span aria-hidden="true">→</span>
+        </a>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <p>
+          © <span id="current-year"></span> Viação LBL Excursões.
+          Todos os direitos reservados.
+        </p>
+        <a href="#inicio">VOLTAR AO TOPO ↑</a>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- MENU MOBILE -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const menuButton = document.getElementById("menu-toggle");
+      const navigation = document.getElementById("main-nav");
+
+      if (menuButton && navigation) {
+        menuButton.addEventListener("click", function () {
+          const isOpen = navigation.classList.toggle("is-open");
+          menuButton.classList.toggle("is-open", isOpen);
+          menuButton.setAttribute("aria-expanded", String(isOpen));
+          menuButton.setAttribute(
+            "aria-label",
+            isOpen ? "Fechar menu" : "Abrir menu"
+          );
+        });
+
+        navigation.querySelectorAll("a").forEach(function (link) {
+          link.addEventListener("click", function () {
+            navigation.classList.remove("is-open");
+            menuButton.classList.remove("is-open");
+            menuButton.setAttribute("aria-expanded", "false");
+            menuButton.setAttribute("aria-label", "Abrir menu");
+          });
+        });
+      }
+
+      const year = document.getElementById("current-year");
+      if (year) {
+        year.textContent = new Date().getFullYear();
+      }
+
+      const dialog = document.getElementById("reservation-dialog");
+      const closeButton = document.getElementById("close-dialog");
+
+      if (dialog && closeButton) {
+        closeButton.addEventListener("click", function () {
+          dialog.close();
+        });
+
+        dialog.addEventListener("click", function (event) {
+          if (event.target === dialog) {
+            dialog.close();
+          }
+        });
+      }
+    });
+  </script>
 
 </body>
 </html>
-```
